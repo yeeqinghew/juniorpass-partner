@@ -27,7 +27,6 @@ import {
 } from "@ant-design/icons";
 import { fetchWithAuth, API_ENDPOINTS } from "../../utils/api";
 import UserContext from "../UserContext";
-import useAddressSearch from "../../hooks/useAddressSearch";
 import _ from "lodash";
 import "./Profile.css";
 import LoadingContainer from "../../utils/LoadingContainer";
@@ -39,7 +38,6 @@ const { TextArea } = Input;
 const Profile = () => {
   const { user } = useContext(UserContext);
   const { categories } = useContext(DataContext);
-  const { addressData, handleAddressSearch } = useAddressSearch();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -288,21 +286,9 @@ const Profile = () => {
                 }
               >
                 <Row gutter={16}>
-                  <Col xs={24} md={12}>
+                  <Col xs={24}>
                     <Form.Item name="contact_number" label="Phone" required>
                       <Input className="input-with-icon" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} md={12}>
-                    <Form.Item name="address" label="HQ Address" required>
-                      <Select
-                        showSearch
-                        onSearch={handleAddressSearch}
-                        options={(addressData || []).map((d) => ({
-                          value: JSON.stringify(d),
-                          label: d.ADDRESS,
-                        }))}
-                      />
                     </Form.Item>
                   </Col>
                 </Row>
