@@ -131,6 +131,7 @@ export const API_ENDPOINTS = {
   UPLOAD_PARTNER_LOGO: "/media/upload/partner-logo",
   UPLOAD_PARTNER_DP: "/media/upload/partner-dp",
   UPLOAD_LISTING_IMAGE: "/media/upload/listing-image",
+  UPLOAD_OUTLET_IMAGE: "/media/upload/outlet-image",
   DELETE_MEDIA: "/media/delete",
 
   // Notifications

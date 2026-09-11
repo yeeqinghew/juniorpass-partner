@@ -19,7 +19,7 @@ import {
   PhoneOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
-import { fetchWithAuth } from "../../utils/api";
+import { API_ENDPOINTS, fetchWithAuth } from "../../utils/api";
 import useAddressSearch from "../../hooks/useAddressSearch";
 import useMRTStations from "../../hooks/useMrtStations";
 import "./OutletForm.css";
@@ -33,6 +33,39 @@ const OutletForm = ({ outlet, onSuccess, onCancel }) => {
   const [fileList, setFileList] = useState([]);
   const { addressData, handleAddressSearch } = useAddressSearch();
   const { mrtStations, renderTags } = useMRTStations();
+
+  const uploadOutletImage = async (file, outletId) => {
+    const signatureResponse = await fetchWithAuth(
+      API_ENDPOINTS.UPLOAD_OUTLET_IMAGE,
+      {
+        method: "POST",
+        body: JSON.stringify({ outletId }),
+      },
+    );
+    const signature = await signatureResponse.json();
+    if (!signatureResponse.ok) {
+      throw new Error(signature.error || "Unable to prepare photo upload");
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("api_key", signature.apiKey);
+    Object.entries(signature.allowedParams).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    formData.append("signature", signature.signature);
+
+    const uploadResponse = await fetch(
+      `https://api.cloudinary.com/v1_1/${signature.cloudName}/image/upload`,
+      { method: "POST", body: formData },
+    );
+    const uploadedImage = await uploadResponse.json();
+    if (!uploadResponse.ok) {
+      throw new Error(uploadedImage.error?.message || "Photo upload failed");
+    }
+
+    return uploadedImage.secure_url;
+  };
 
   useEffect(() => {
     if (outlet?.images) {
@@ -60,13 +93,16 @@ const OutletForm = ({ outlet, onSuccess, onCancel }) => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      const imageUrls = fileList
-        .filter((file) => file.status === "done")
-        .map((file) => file.url || file.response?.url);
+      const existingImageUrls = fileList
+        .map((file) => file.url || file.response?.url)
+        .filter(Boolean);
+      const pendingFiles = fileList
+        .filter((file) => !file.url && !file.response?.url)
+        .map((file) => file.originFileObj || file);
 
       const submitData = {
         ...values,
-        images: JSON.stringify(imageUrls),
+        images: JSON.stringify(existingImageUrls),
       };
 
       const url = outlet ? `/outlets/${outlet.outlet_id}` : "/outlets";
@@ -77,10 +113,34 @@ const OutletForm = ({ outlet, onSuccess, onCancel }) => {
         body: JSON.stringify(submitData),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
+        const savedOutletId = outlet?.outlet_id || data.outlet?.outlet_id;
+        const uploadedImageUrls = await Promise.all(
+          pendingFiles.map((file) => uploadOutletImage(file, savedOutletId)),
+        );
+
+        if (uploadedImageUrls.length > 0) {
+          const imageUpdateResponse = await fetchWithAuth(
+            API_ENDPOINTS.UPDATE_OUTLET(savedOutletId),
+            {
+              method: "PATCH",
+              body: JSON.stringify({
+                images: JSON.stringify([
+                  ...existingImageUrls,
+                  ...uploadedImageUrls,
+                ]),
+              }),
+            },
+          );
+          if (!imageUpdateResponse.ok) {
+            throw new Error("Photos uploaded, but the outlet could not be updated");
+          }
+        }
+
         onSuccess();
       } else {
-        const data = await response.json();
         message.error(data.error || "Failed to save outlet");
         if (data.error?.includes("name")) {
           form.setFields([
