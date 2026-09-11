@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import CryptoJS from "crypto-js";
 import { fetchWithAuth, API_ENDPOINTS } from "../../utils/api";
 import "./ForcePasswordChange.css";
+import { strongPasswordRule } from "../../utils/passwordValidation";
 
 const { Title, Text, Paragraph } = Typography;
 const { Step } = Steps;
@@ -105,12 +106,7 @@ const ForcePasswordChange = ({ setAuth }) => {
               name="newPassword"
               rules={[
                 { required: true, message: "Please enter a new password" },
-                { min: 8, message: "Password must be at least 8 characters" },
-                {
-                  pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                  message:
-                    "Password must contain uppercase, lowercase, and number",
-                },
+                strongPasswordRule,
               ]}
               hasFeedback
             >

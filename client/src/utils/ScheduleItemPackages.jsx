@@ -488,6 +488,9 @@ const ScheduleItemWithPackages = ({ field, remove, form }) => {
                     placeholder="Booking opens…"
                     size="large"
                     style={{ width: "100%" }}
+                    disabledDate={(date) =>
+                      date && date.startOf("day").isBefore(dayjs().startOf("day"))
+                    }
                   />
                 </Form.Item>
 
