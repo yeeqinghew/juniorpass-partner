@@ -95,6 +95,21 @@
   gap: 8px;
 }
 
+.time-slot-capacity-field {
+  flex: 0 1 130px;
+  margin-bottom: 0;
+}
+
+.capacity-input {
+  width: 100%;
+}
+
+.progressive-capacity-field {
+  max-width: 240px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
 .time-slot-row {
   display: flex;
   align-items: flex-start;
@@ -183,6 +198,30 @@
   border: 1px solid var(--border-color, #e8e8e8);
   border-radius: 8px;
   padding: 10px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.progressive-toggle-control {
+  margin-bottom: 0;
+}
+
+.progressive-toggle-copy {
+  margin-top: -2px;
+}
+
+.progressive-toggle-hint {
+  display: block;
+  margin-top: 2px;
+}
+
+.package-type-heading {
+  margin-top: 18px;
+}
+
+.package-type-field {
+  margin-bottom: 8px;
 }
 
 /* ── Package option in dropdown ──────────────────────────────────────────────── */

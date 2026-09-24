@@ -52,12 +52,13 @@ const buildPayload = (values, partnerId) => ({
           .map((slot) => ({
             day: slot.day,
             timeslot: slot.timeslot,
-            slots: slot.slots,
+            slots: schedule.is_progressive ? undefined : slot.slots,
           })),
         // Package configuration (shared across all time slots)
         frequency: schedule.frequency,
         package_types: schedule.package_types,
         is_progressive: schedule.is_progressive || false,
+        capacity: schedule.is_progressive ? schedule.capacity : null,
         full_term_start_date: schedule.full_term_start_date
           ? (dayjs.isDayjs(schedule.full_term_start_date)
               ? schedule.full_term_start_date.format("YYYY-MM-DD")
@@ -143,13 +144,16 @@ const CreateClass = () => {
         outlet.schedule_groups.some(
           (schedule) =>
             schedule.time_slots.length === 0 ||
+            (schedule.is_progressive &&
+              (!Number.isInteger(schedule.capacity) ||
+                schedule.capacity < 1)) ||
             schedule.time_slots.some(
               (slot) =>
                 !slot.day ||
                 !Array.isArray(slot.timeslot) ||
                 slot.timeslot.length !== 2 ||
-                !Number.isInteger(slot.slots) ||
-                slot.slots < 1,
+                (!schedule.is_progressive &&
+                  (!Number.isInteger(slot.slots) || slot.slots < 1)),
             ),
         ),
     );
@@ -488,6 +492,7 @@ const CreateClass = () => {
                           <ScheduleItemWithPackages
                             key={scheduleField.key}
                             field={scheduleField}
+                            outletIndex={outletField.name}
                             remove={removeSchedule}
                             form={createClassForm}
                           />

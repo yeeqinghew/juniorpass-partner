@@ -104,6 +104,7 @@ const EditClass = () => {
             // Map schedule_group to schedule form structure
             return {
               schedule_group_id: group.schedule_group_id,
+              capacity: group.capacity ?? undefined,
               time_slots: (group.time_slots || []).map((slot) => ({
                 day: slot.day,
                 timeslot: [slot.start_time, slot.end_time],
@@ -243,11 +244,16 @@ const EditClass = () => {
                       .map((slot) => ({
                         day: slot.day,
                         timeslot: slot.timeslot,
-                        slots: slot.slots,
+                        slots: schedule.is_progressive
+                          ? undefined
+                          : slot.slots,
                       })),
                     frequency: schedule.frequency,
                     package_types: schedule.package_types,
                     is_progressive: schedule.is_progressive || false,
+                    capacity: schedule.is_progressive
+                      ? schedule.capacity
+                      : null,
                     full_term_start_date: schedule.full_term_start_date
                       ? (dayjs.isDayjs(schedule.full_term_start_date)
                           ? schedule.full_term_start_date.format("YYYY-MM-DD")
@@ -583,6 +589,7 @@ const EditClass = () => {
                                 <ScheduleItemWithPackages
                                   key={scheduleField.key}
                                   field={scheduleField}
+                                  outletIndex={outletField.name}
                                   remove={() =>
                                     removeSchedule(scheduleField.name)
                                   }

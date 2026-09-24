@@ -22,7 +22,7 @@ import {
   PlusOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import { useState, useEffect, useContext, useCallback } from "react";
+import { useState, useEffect, useContext, useCallback, useMemo } from "react";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import TimeRangePicker from "./TimeRangePicker";
@@ -91,7 +91,7 @@ const calcShortTermPrice = (ltTotal, ltClasses, stClasses) => {
 
 // ─── sub-component: single time slot row ─────────────────────────────────────
 
-const TimeSlotRow = ({ slotIndex, scheduleField, remove, form, isOnly }) => (
+const TimeSlotRow = ({ slotIndex, remove, isOnly, isProgressive }) => (
   <div className="time-slot-row">
     <div className="time-slot-fields">
       <Form.Item
@@ -116,22 +116,24 @@ const TimeSlotRow = ({ slotIndex, scheduleField, remove, form, isOnly }) => (
         <TimeRangePicker />
       </Form.Item>
 
-      <Form.Item
-        name={[slotIndex, "slots"]}
-        rules={[
-          { required: true, message: "Enter capacity" },
-          { type: "number", min: 1, max: 100, message: "1–100" },
-        ]}
-        style={{ marginBottom: 0, flex: "0 1 130px" }}
-      >
-        <InputNumber
-          placeholder="Capacity"
-          min={1}
-          max={100}
-          size="large"
-          style={{ width: "100%" }}
-        />
-      </Form.Item>
+      {!isProgressive && (
+        <Form.Item
+          name={[slotIndex, "slots"]}
+          rules={[
+            { required: true, message: "Enter capacity" },
+            { type: "number", min: 1, max: 100, message: "1–100" },
+          ]}
+          className="time-slot-capacity-field"
+        >
+          <InputNumber
+            placeholder="Capacity"
+            min={1}
+            max={100}
+            size="large"
+            className="capacity-input"
+          />
+        </Form.Item>
+      )}
     </div>
 
     {!isOnly && (
@@ -149,16 +151,20 @@ const TimeSlotRow = ({ slotIndex, scheduleField, remove, form, isOnly }) => (
 
 // ─── main component ───────────────────────────────────────────────────────────
 
-const ScheduleItemWithPackages = ({ field, remove, form }) => {
+const ScheduleItemWithPackages = ({ field, outletIndex, remove, form }) => {
   const { packageTypes: dbPackageTypes } = useContext(DataContext);
+  const schedulePath = useMemo(
+    () => ["outlets", outletIndex, "schedules", field.name],
+    [field.name, outletIndex],
+  );
   const packageTypes =
     Form.useWatch(
-      ["outlets", field.name, "schedules", field.name, "package_types"],
+      [...schedulePath, "package_types"],
       form,
     ) || [];
   // const [packageTypes, setPackageTypes] = useState([]);
   const isProgressive = Form.useWatch(
-    ["outlets", field.name, "schedules", field.name, "is_progressive"],
+    [...schedulePath, "is_progressive"],
     form,
   );
   const [ltTotal, setLtTotal] = useState(null); // full-term total price
@@ -172,10 +178,7 @@ const ScheduleItemWithPackages = ({ field, remove, form }) => {
   useEffect(() => {
     // Grab current values from the form instance
     const currentSchedule = form.getFieldValue([
-      "outlets",
-      field.name,
-      "schedules",
-      field.name,
+      ...schedulePath,
     ]);
 
     if (currentSchedule) {
@@ -184,23 +187,24 @@ const ScheduleItemWithPackages = ({ field, remove, form }) => {
       if (currentSchedule.full_term_class_count)
         setLtClasses(currentSchedule.full_term_class_count);
     }
-  }, [field.name, form]);
+  }, [form, schedulePath]);
 
   // Persist the auto-calculated values in the hidden fields submitted by the
   // create/edit forms.
   useEffect(() => {
     form.setFieldValue(
-      ["outlets", field.name, "schedules", field.name, "short_term_class_count"],
+      [...schedulePath, "short_term_class_count"],
       stClasses,
     );
     form.setFieldValue(
-      ["outlets", field.name, "schedules", field.name, "price_shortterm"],
+      [...schedulePath, "price_shortterm"],
       stPrice,
     );
-  }, [field.name, form, stClasses, stPrice]);
+  }, [form, schedulePath, stClasses, stPrice]);
 
   const handleProgressiveChange = useCallback(
     (checked) => {
+      const currentSchedule = form.getFieldValue(schedulePath) || {};
       if (checked) {
         const filtered = packageTypes.filter(
           (t) => t === "full-term" || t === "short-term",
@@ -209,9 +213,16 @@ const ScheduleItemWithPackages = ({ field, remove, form }) => {
         // setPackageTypes(filtered);
 
         form.setFieldValue(
-          ["outlets", field.name, "schedules", field.name, "package_types"],
+          [...schedulePath, "package_types"],
           filtered,
         );
+
+        if (!currentSchedule.capacity) {
+          form.setFieldValue(
+            [...schedulePath, "capacity"],
+            currentSchedule.time_slots?.find((slot) => slot?.slots)?.slots,
+          );
+        }
 
         if (packageTypes.some((t) => ["pay-as-you-go", "trial"].includes(t))) {
           toast(
@@ -221,38 +232,43 @@ const ScheduleItemWithPackages = ({ field, remove, form }) => {
             },
           );
         }
+      } else if (currentSchedule.capacity) {
+        form.setFieldValue(
+          [...schedulePath, "time_slots"],
+          (currentSchedule.time_slots || []).map((slot) => ({
+            ...slot,
+            slots: slot.slots || currentSchedule.capacity,
+          })),
+        );
       }
     },
-    [packageTypes, field.name, form],
+    [form, packageTypes, schedulePath],
   );
 
   const handlePackageChange = useCallback(
     (types) => {
       form.setFieldValue(
-        ["outlets", field.name, "schedules", field.name, "package_types"],
+      [...schedulePath, "package_types"],
         types,
       );
     },
-    [field.name, form],
+    [form, schedulePath],
   );
 
   useEffect(() => {
-    if (typeof isProgressive !== "boolean") return;
+    if (!isProgressive) return;
 
-    const allowedTypes = isProgressive
-      ? ["full-term", "short-term"]
-      : ["pay-as-you-go", "trial"];
     const filtered = packageTypes.filter((type) =>
-      allowedTypes.includes(type),
+      ["full-term", "short-term"].includes(type),
     );
 
     if (filtered.length !== packageTypes.length) {
       form.setFieldValue(
-        ["outlets", field.name, "schedules", field.name, "package_types"],
+        [...schedulePath, "package_types"],
         filtered,
       );
     }
-  }, [field.name, form, isProgressive, packageTypes]);
+  }, [form, isProgressive, packageTypes, schedulePath]);
 
   const comboValid = isValidCombo(packageTypes);
   const hasFullTerm = packageTypes.includes("full-term");
@@ -280,6 +296,115 @@ const ScheduleItemWithPackages = ({ field, remove, form }) => {
 
         <Divider className="card-divider" />
 
+        {/* ── Schedule type ── */}
+        <div className="section-block">
+          <div className="section-title">Schedule Type</div>
+          <div className="progressive-toggle">
+            <Form.Item
+              name={[field.name, "is_progressive"]}
+              valuePropName="checked"
+              className="progressive-toggle-control"
+            >
+              <Switch onChange={handleProgressiveChange} />
+            </Form.Item>
+
+            <div className="progressive-toggle-copy">
+              <Space>
+                <Text strong>Progressive Classes</Text>
+                <Tooltip title="Each lesson builds on the previous — prevents mid-cycle joins and allows full-term/short-term packages only.">
+                  <InfoCircleOutlined className="info-icon" />
+                </Tooltip>
+              </Space>
+              <Text
+                type="secondary"
+                className="section-hint progressive-toggle-hint"
+              >
+                Enable for structured curricula where children attend the full
+                programme.
+              </Text>
+            </div>
+          </div>
+
+          <div className="package-type-heading">
+            <div className="section-title">
+              Package Types
+              <Tooltip title="Choose how parents can book this schedule. Not all combinations are valid.">
+                <InfoCircleOutlined className="info-icon" />
+              </Tooltip>
+            </div>
+          </div>
+
+          <Form.Item
+            name={[field.name, "package_types"]}
+            rules={[
+              { required: true, message: "Select at least one package type" },
+            ]}
+            className="package-type-field"
+          >
+            <Select
+              mode="multiple"
+              placeholder="Select package types…"
+              size="large"
+              onChange={handlePackageChange}
+              maxTagCount="responsive"
+              optionLabelProp="label"
+            >
+              {dbPackageTypes &&
+                dbPackageTypes.map((pkg) => (
+                  <Select.Option
+                    key={pkg.id}
+                    value={pkg.package_type}
+                    label={pkg.name}
+                    disabled={
+                      isProgressive &&
+                      ["pay-as-you-go", "trial"].includes(pkg.package_type)
+                    }
+                  >
+                    <div className="pkg-option">
+                      <span className="pkg-option-label">{pkg.name}</span>
+                      {pkg.description && (
+                        <span className="pkg-option-desc">
+                          {pkg.description}
+                        </span>
+                      )}
+                      {isProgressive &&
+                        ["pay-as-you-go", "trial"].includes(
+                          pkg.package_type,
+                        ) && (
+                        <span className="pkg-option-blocked">
+                          Not available for this class type
+                        </span>
+                      )}
+                    </div>
+                  </Select.Option>
+                ))}
+            </Select>
+          </Form.Item>
+
+          {packageTypes.length > 0 && (
+            <Alert
+              message={
+                comboValid
+                  ? "Valid package combination ✓"
+                  : "Invalid combination. Choose Full-term, Full-term + Short-term, Pay-as-you-go, or Pay-as-you-go + Trial."
+              }
+              type={comboValid ? "success" : "warning"}
+              showIcon
+              className="combo-alert"
+            />
+          )}
+          {isProgressive && (
+            <Alert
+              message="Progressive mode: only Full-term and Short-term are available"
+              type="info"
+              showIcon
+              className="combo-alert"
+            />
+          )}
+        </div>
+
+        <Divider className="card-divider" />
+
         {/* ── Time Slots ── */}
         <div className="section-block">
           <div className="section-title">
@@ -293,6 +418,26 @@ const ScheduleItemWithPackages = ({ field, remove, form }) => {
             Children who enrol in this schedule must attend every slot listed.
           </Text>
 
+          {isProgressive && (
+            <Form.Item
+              name={[field.name, "capacity"]}
+              label="Programme Capacity"
+              rules={[
+                { required: true, message: "Enter capacity" },
+                { type: "number", min: 1, max: 100, message: "1–100" },
+              ]}
+              className="progressive-capacity-field"
+            >
+              <InputNumber
+                placeholder="Students"
+                min={1}
+                max={100}
+                size="large"
+                className="capacity-input"
+              />
+            </Form.Item>
+          )}
+
           <Form.List name={[field.name, "time_slots"]}>
             {(slotFields, { add: addSlot, remove: removeSlot }) => (
               <div className="time-slots-list">
@@ -302,8 +447,8 @@ const ScheduleItemWithPackages = ({ field, remove, form }) => {
                     slotIndex={idx}
                     scheduleField={field}
                     remove={removeSlot}
-                    form={form}
                     isOnly={slotFields.length === 1}
+                    isProgressive={isProgressive}
                   />
                 ))}
                 <Button
@@ -339,124 +484,6 @@ const ScheduleItemWithPackages = ({ field, remove, form }) => {
             </Form.Item>
 
           </div>
-        </div>
-
-        <Divider className="card-divider" />
-
-        {/* ── Package Configuration ── */}
-        <div className="section-block">
-          <div className="section-title">
-            Package Types
-            <Tooltip title="Choose how parents can book this schedule. Not all combinations are valid.">
-              <InfoCircleOutlined className="info-icon" />
-            </Tooltip>
-          </div>
-
-          {/* Progressive toggle */}
-          {/* Progressive toggle */}
-          <div className="progressive-toggle">
-            <Space align="start">
-              {/* Keep Form.Item wrapped tightly around the Switch only */}
-              <Form.Item
-                name={[field.name, "is_progressive"]}
-                valuePropName="checked"
-                style={{ marginBottom: 0 }}
-              >
-                <Switch onChange={handleProgressiveChange} />
-              </Form.Item>
-
-              <div style={{ marginTop: -2 }}>
-                <Space>
-                  <Text strong>Progressive Classes</Text>
-                  <Tooltip title="Each lesson builds on the previous — prevents mid-cycle joins and allows full-term/short-term packages only.">
-                    <InfoCircleOutlined className="info-icon" />
-                  </Tooltip>
-                </Space>
-                <Text
-                  type="secondary"
-                  className="section-hint"
-                  style={{ display: "block", marginTop: 2 }}
-                >
-                  Enable for structured curricula where skipping sessions isn't
-                  possible
-                </Text>
-              </div>
-            </Space>
-          </div>
-
-          {/* Package type selector */}
-          <Form.Item
-            name={[field.name, "package_types"]}
-            rules={[
-              { required: true, message: "Select at least one package type" },
-            ]}
-            style={{ marginBottom: 8 }}
-          >
-            <Select
-              mode="multiple"
-              placeholder="Select package types…"
-              size="large"
-              onChange={handlePackageChange}
-              maxTagCount="responsive"
-              optionLabelProp="label"
-            >
-              {dbPackageTypes &&
-                dbPackageTypes.map((pkg) => (
-                  <Select.Option
-                    key={pkg.id}
-                    value={pkg.package_type}
-                    label={pkg.name}
-                    disabled={
-                      isProgressive
-                        ? ["pay-as-you-go", "trial"].includes(pkg.package_type)
-                        : ["full-term", "short-term"].includes(pkg.package_type)
-                    }
-                  >
-                    <div className="pkg-option">
-                      <span className="pkg-option-label">{pkg.name}</span>
-
-                      {pkg.description && (
-                        <span className="pkg-option-desc">
-                          {pkg.description}
-                        </span>
-                      )}
-
-                      {(isProgressive
-                        ? ["pay-as-you-go", "trial"].includes(pkg.package_type)
-                        : ["full-term", "short-term"].includes(
-                            pkg.package_type,
-                          )) && (
-                          <span className="pkg-option-blocked">
-                            Not available for this class type
-                          </span>
-                        )}
-                    </div>
-                  </Select.Option>
-                ))}
-            </Select>
-          </Form.Item>
-
-          {/* Validation hint */}
-          {packageTypes.length > 0 && (
-            <Alert
-              message={
-                comboValid
-                  ? "Valid package combination ✓"
-                  : "Invalid combination. Progressive classes use Full-term or Full-term + Short-term. Non-progressive classes use Pay-as-you-go or Pay-as-you-go + Trial."
-              }
-              type={comboValid ? "success" : "warning"}
-              showIcon
-              className="combo-alert"
-            />
-          )}
-          {isProgressive && (
-            <Alert
-              message="Progressive mode: only Full-term and Short-term are available"
-              type="info"
-              showIcon
-              className="combo-alert"
-            />
-          )}
         </div>
 
         {/* ── Full-term config ── */}

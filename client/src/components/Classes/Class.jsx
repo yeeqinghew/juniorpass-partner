@@ -467,6 +467,14 @@ const Class = () => {
                               <Text strong className="subsection-header">
                                 Time Slots
                               </Text>
+                              {group.is_progressive && (
+                                <Tag
+                                  icon={<TeamOutlined />}
+                                  className="info-tag"
+                                >
+                                  {group.capacity ?? "Not set"} programme capacity
+                                </Tag>
+                              )}
                               <Space
                                 direction="vertical"
                                 size={8}
@@ -488,12 +496,14 @@ const Class = () => {
                                         slot.end_time,
                                       )}
                                     </Text>
-                                    <Tag
-                                      icon={<TeamOutlined />}
-                                      className="info-tag"
-                                    >
-                                      {slot.slots ?? "Not set"} capacity
-                                    </Tag>
+                                    {!group.is_progressive && (
+                                      <Tag
+                                        icon={<TeamOutlined />}
+                                        className="info-tag"
+                                      >
+                                        {slot.slots ?? "Not set"} capacity
+                                      </Tag>
+                                    )}
                                   </div>
                                 ))}
                               </Space>
