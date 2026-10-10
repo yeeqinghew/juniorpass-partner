@@ -681,6 +681,28 @@
   gap: var(--spacing-lg);
 }
 
+.booking-policy-intro {
+  max-width: 720px;
+  margin: calc(var(--spacing-md) * -1) 0 var(--spacing-lg);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+}
+
+.booking-policy-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 var(--spacing-lg);
+}
+
+.booking-policy-grid .ant-input-number {
+  width: 100%;
+}
+
+.textarea-requirements {
+  resize: vertical;
+}
+
 .outlet-section {
   padding: var(--spacing-lg);
   background: var(--bg-cream);
@@ -773,6 +795,11 @@
   }
 
   .class-form-card .fields-row-2 {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .booking-policy-grid {
     grid-template-columns: 1fr;
     gap: 0;
   }

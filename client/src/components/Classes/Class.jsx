@@ -15,6 +15,7 @@ import {
   PlayCircleOutlined,
   CheckCircleOutlined,
   MoreOutlined,
+  SafetyCertificateOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -222,7 +223,7 @@ const Class = () => {
     if (typeof images === "string") {
       try {
         images = JSON.parse(images);
-      } catch (e) {
+      } catch {
         images = [];
       }
     }
@@ -381,6 +382,45 @@ const Class = () => {
             </div>
           </Col>
         </Row>
+      </Card>
+
+      <Card className="class-policy-card">
+        <div className="class-policy-heading">
+          <SafetyCertificateOutlined />
+          <div>
+            <Title level={3}>Booking policy</Title>
+            <Text>These terms are shown to families before confirmation.</Text>
+          </div>
+        </div>
+        <dl className="class-policy-grid">
+          <div>
+            <dt>Cancellation deadline</dt>
+            <dd>{listing?.cancellation_notice_hours ?? 24} hours before class</dd>
+          </div>
+          <div>
+            <dt>Refund before deadline</dt>
+            <dd>{listing?.refund_before_deadline_percent ?? 100}% of credits</dd>
+          </div>
+          <div>
+            <dt>Refund after deadline</dt>
+            <dd>{listing?.refund_after_deadline_percent ?? 0}% of credits</dd>
+          </div>
+          <div>
+            <dt>Make-up requests</dt>
+            <dd>
+              {listing?.makeup_allowed
+                ? `Allowed with ${listing?.makeup_notice_hours ?? 24} hours’ notice`
+                : "Not allowed"}
+            </dd>
+          </div>
+          <div className="class-policy-requirements">
+            <dt>Important requirements</dt>
+            <dd>
+              {listing?.class_requirements ||
+                "No additional requirements provided"}
+            </dd>
+          </div>
+        </dl>
       </Card>
 
       {/* Schedules & Locations */}

@@ -4,7 +4,16 @@ import {
   LeftOutlined,
   EnvironmentOutlined,
 } from "@ant-design/icons";
-import { Button, Form, Input, Select, Typography, Upload } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Switch,
+  Typography,
+  Upload,
+} from "antd";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import TextArea from "antd/es/input/TextArea";
@@ -309,6 +318,14 @@ const CreateClass = () => {
         form={createClassForm}
         onFinish={handleCreateClass}
         layout="vertical"
+        initialValues={{
+          cancellation_notice_hours: 24,
+          refund_before_deadline_percent: 100,
+          refund_after_deadline_percent: 0,
+          makeup_allowed: false,
+          makeup_notice_hours: 24,
+          class_requirements: "",
+        }}
       >
         {/* ── Basic info ── */}
         <section className="class-form-card">
@@ -518,11 +535,79 @@ const CreateClass = () => {
           )}
         </Form.List>
 
-        {/* ── Images ── */}
         </section>
+
+        <section className="class-form-card">
+          <div className="form-section-header">
+            <span className="form-section-number">3</span>
+            <span>
+              <strong>Booking Policy</strong>
+              <small>Set the terms families will see before confirming.</small>
+            </span>
+          </div>
+
+          <div className="booking-policy-grid">
+            <Form.Item
+              name="cancellation_notice_hours"
+              label="Cancellation deadline"
+              extra="Hours before the first class."
+              rules={[{ required: true, message: "Enter the notice period" }]}
+            >
+              <InputNumber min={0} max={720} addonAfter="hours" size="large" />
+            </Form.Item>
+            <Form.Item
+              name="refund_before_deadline_percent"
+              label="Refund before deadline"
+              extra="Percentage of charged credits returned."
+              rules={[{ required: true, message: "Enter the refund percentage" }]}
+            >
+              <InputNumber min={0} max={100} addonAfter="%" size="large" />
+            </Form.Item>
+            <Form.Item
+              name="refund_after_deadline_percent"
+              label="Refund after deadline"
+              extra="Use 0% when late cancellations are non-refundable."
+              rules={[{ required: true, message: "Enter the late refund percentage" }]}
+            >
+              <InputNumber min={0} max={100} addonAfter="%" size="large" />
+            </Form.Item>
+            <Form.Item
+              name="makeup_notice_hours"
+              label="Make-up request notice"
+              extra="Used when make-up requests are allowed."
+              rules={[{ required: true, message: "Enter the notice period" }]}
+            >
+              <InputNumber min={0} max={720} addonAfter="hours" size="large" />
+            </Form.Item>
+          </div>
+
+          <Form.Item
+            name="makeup_allowed"
+            label="Allow make-up requests"
+            valuePropName="checked"
+          >
+            <Switch checkedChildren="Allowed" unCheckedChildren="Not allowed" />
+          </Form.Item>
+
+          <Form.Item
+            name="class_requirements"
+            label="Important class requirements"
+            extra="For example: clothing, equipment, arrival time, or parent attendance."
+          >
+            <TextArea
+              showCount
+              maxLength={2000}
+              placeholder="Bring sports shoes and a water bottle. Please arrive 10 minutes early."
+              className="textarea-requirements"
+              autoSize={{ minRows: 3, maxRows: 7 }}
+            />
+          </Form.Item>
+        </section>
+
+        {/* ── Images ── */}
         <section className="class-form-card">
         <div className="form-section-header">
-          <span className="form-section-number">3</span>
+          <span className="form-section-number">4</span>
           <span>
             <strong>Class Images <span className="required-star">*</span></strong>
             <small>Show families what they can expect.</small>

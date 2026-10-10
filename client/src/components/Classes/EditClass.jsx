@@ -9,7 +9,9 @@ import {
   Button,
   Form,
   Input,
+  InputNumber,
   Select,
+  Switch,
   Typography,
   Upload,
   Row,
@@ -40,15 +42,13 @@ const EditClass = () => {
   const { listing_id } = useParams();
   const [images, setImages] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
-  const { packageTypes, ageGroups, categories } = useContext(DataContext);
+  const { ageGroups, categories } = useContext(DataContext);
   const [editClassForm] = Form.useForm();
-  const [selectedPackageTypes, setSelectedPackageTypes] = useState([]);
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
   const [outlets, setOutlets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [listing, setListing] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState("");
 
@@ -81,7 +81,6 @@ const EditClass = () => {
         },
       );
       const parseRes = await response.json();
-      setListing(parseRes);
 
       // Parse existing images
       let imgs = parseRes.images;
@@ -132,10 +131,17 @@ const EditClass = () => {
         description: parseRes.description,
         category_ids: parseRes.category_ids || [],
         age_groups: parseRes.age_groups,
+        cancellation_notice_hours: parseRes.cancellation_notice_hours ?? 24,
+        refund_before_deadline_percent:
+          parseRes.refund_before_deadline_percent ?? 100,
+        refund_after_deadline_percent:
+          parseRes.refund_after_deadline_percent ?? 0,
+        makeup_allowed: parseRes.makeup_allowed ?? false,
+        makeup_notice_hours: parseRes.makeup_notice_hours ?? 24,
+        class_requirements: parseRes.class_requirements || "",
         outlets: outletsData,
       });
 
-      setSelectedPackageTypes(parseRes.package_types || []);
     } catch (error) {
       console.error("Error fetching class details:", error);
       message.error("Failed to load class details");
@@ -182,11 +188,6 @@ const EditClass = () => {
     editClassForm.setFieldValue("age_groups", values);
   };
 
-  const handleSelectPackage = (values) => {
-    setSelectedPackageTypes(values);
-    editClassForm.setFieldValue("package_types", values);
-  };
-
   const handleRemoveExistingImage = (index) => {
     setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
@@ -207,6 +208,14 @@ const EditClass = () => {
             description: values.description,
             category_ids: values.category_ids,
             age_groups: values.age_groups,
+            cancellation_notice_hours: values.cancellation_notice_hours,
+            refund_before_deadline_percent:
+              values.refund_before_deadline_percent,
+            refund_after_deadline_percent:
+              values.refund_after_deadline_percent,
+            makeup_allowed: values.makeup_allowed,
+            makeup_notice_hours: values.makeup_notice_hours,
+            class_requirements: values.class_requirements,
           }),
         },
       );
@@ -631,6 +640,69 @@ const EditClass = () => {
             </>
           )}
         </Form.List>
+
+        <div className="form-section-header">Booking Policy</div>
+        <p className="booking-policy-intro">
+          These terms are shown before confirmation. Existing bookings keep the
+          policy that was captured when they were made.
+        </p>
+
+        <div className="booking-policy-grid">
+          <Form.Item
+            name="cancellation_notice_hours"
+            label="Cancellation deadline"
+            extra="Hours before the first class."
+            rules={[{ required: true, message: "Enter the notice period" }]}
+          >
+            <InputNumber min={0} max={720} addonAfter="hours" size="large" />
+          </Form.Item>
+          <Form.Item
+            name="refund_before_deadline_percent"
+            label="Refund before deadline"
+            extra="Percentage of charged credits returned."
+            rules={[{ required: true, message: "Enter the refund percentage" }]}
+          >
+            <InputNumber min={0} max={100} addonAfter="%" size="large" />
+          </Form.Item>
+          <Form.Item
+            name="refund_after_deadline_percent"
+            label="Refund after deadline"
+            extra="Use 0% when late cancellations are non-refundable."
+            rules={[{ required: true, message: "Enter the late refund percentage" }]}
+          >
+            <InputNumber min={0} max={100} addonAfter="%" size="large" />
+          </Form.Item>
+          <Form.Item
+            name="makeup_notice_hours"
+            label="Make-up request notice"
+            extra="Used when make-up requests are allowed."
+            rules={[{ required: true, message: "Enter the notice period" }]}
+          >
+            <InputNumber min={0} max={720} addonAfter="hours" size="large" />
+          </Form.Item>
+        </div>
+
+        <Form.Item
+          name="makeup_allowed"
+          label="Allow make-up requests"
+          valuePropName="checked"
+        >
+          <Switch checkedChildren="Allowed" unCheckedChildren="Not allowed" />
+        </Form.Item>
+
+        <Form.Item
+          name="class_requirements"
+          label="Important class requirements"
+          extra="For example: clothing, equipment, arrival time, or parent attendance."
+        >
+          <TextArea
+            showCount
+            maxLength={2000}
+            placeholder="Bring sports shoes and a water bottle. Please arrive 10 minutes early."
+            className="textarea-requirements"
+            autoSize={{ minRows: 3, maxRows: 7 }}
+          />
+        </Form.Item>
 
         <div className="form-section-header">Class Images</div>
 
