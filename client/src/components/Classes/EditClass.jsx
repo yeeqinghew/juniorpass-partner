@@ -21,6 +21,7 @@ import {
   Image,
   message,
   Spin,
+  Alert,
 } from "antd";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -51,6 +52,7 @@ const EditClass = () => {
   const [saving, setSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState("");
+  const [hasBookings, setHasBookings] = useState(false);
 
   // Fetch outlets for the current partner
   const fetchOutlets = async () => {
@@ -81,6 +83,10 @@ const EditClass = () => {
         },
       );
       const parseRes = await response.json();
+      const listingHasBookings =
+        parseRes.has_booking_history === true ||
+        Number(parseRes.signup_count || 0) > 0;
+      setHasBookings(listingHasBookings);
 
       // Parse existing images
       let imgs = parseRes.images;
@@ -99,10 +105,12 @@ const EditClass = () => {
       if (parseRes.outlets_info && parseRes.outlets_info.length > 0) {
         outletsData = parseRes.outlets_info.map((outlet) => ({
           outlet_id: outlet.outlet_id,
+          locked: listingHasBookings,
           schedules: (outlet.schedule_groups || []).map((group) => {
             // Map schedule_group to schedule form structure
             return {
               schedule_group_id: group.schedule_group_id,
+              locked: listingHasBookings,
               capacity: group.capacity ?? undefined,
               time_slots: (group.time_slots || []).map((slot) => ({
                 day: slot.day,
@@ -535,6 +543,16 @@ const EditClass = () => {
 
         <div className="form-section-header">Outlets & Schedules</div>
 
+        {hasBookings && (
+          <Alert
+            type="info"
+            showIcon
+            className="enrolment-lock-alert"
+            message="Existing outlets and schedules are protected"
+            description="You may update prices for future purchases or add a new outlet. Existing package types, programme settings, frequency, class counts, capacity, dates, and time slots are locked."
+          />
+        )}
+
         <Form.List name="outlets">
           {(outletFields, { add: addOutlet, remove: removeOutlet }) => (
             <>
@@ -564,7 +582,17 @@ const EditClass = () => {
                         { required: true, message: "Please select an outlet" },
                       ]}
                     >
-                      <Select placeholder="Select an outlet" size="large">
+                      <Select
+                        placeholder="Select an outlet"
+                        size="large"
+                        disabled={Boolean(
+                          editClassForm.getFieldValue([
+                            "outlets",
+                            outletField.name,
+                            "locked",
+                          ]),
+                        )}
+                      >
                         {outlets.map((outletOption) => {
                           const parsedAddress = JSON.parse(
                             outletOption.address,
@@ -603,6 +631,15 @@ const EditClass = () => {
                                     removeSchedule(scheduleField.name)
                                   }
                                   form={editClassForm}
+                                  locked={Boolean(
+                                    editClassForm.getFieldValue([
+                                      "outlets",
+                                      outletField.name,
+                                      "schedules",
+                                      scheduleField.name,
+                                      "locked",
+                                    ]),
+                                  )}
                                 />
                               </Col>
                             </Row>
@@ -616,6 +653,13 @@ const EditClass = () => {
                               icon={<PlusCircleOutlined />}
                               className="add-schedule-button"
                               block
+                              disabled={Boolean(
+                                editClassForm.getFieldValue([
+                                  "outlets",
+                                  outletField.name,
+                                  "locked",
+                                ]),
+                              )}
                             >
                               Add Schedule
                             </Button>
@@ -631,6 +675,13 @@ const EditClass = () => {
                       className="remove-outlet-button"
                       style={{ marginTop: "10px" }}
                       block
+                      disabled={Boolean(
+                        editClassForm.getFieldValue([
+                          "outlets",
+                          outletField.name,
+                          "locked",
+                        ]),
+                      )}
                     >
                       Remove Outlet
                     </Button>

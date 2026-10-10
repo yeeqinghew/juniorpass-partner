@@ -316,6 +316,10 @@
   border-color: var(--color-error) !important;
 }
 
+.enrolment-lock-alert {
+  margin: calc(var(--spacing-sm) * -1) 0 var(--spacing-lg);
+}
+
 .save-button {
   background: var(--gradient-blue) !important;
   border: none !important;

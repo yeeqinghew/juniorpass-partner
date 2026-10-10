@@ -1,0 +1,206 @@
+.earnings-page {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.earnings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.earnings-header h1.ant-typography,
+.earnings-panel-heading h3.ant-typography {
+  margin: 0;
+  color: var(--text-dark);
+}
+
+.earnings-header h1.ant-typography {
+  font-size: var(--font-size-4xl);
+}
+
+.earnings-kicker {
+  color: var(--primary-dark);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.earnings-subtitle {
+  display: block;
+  margin-top: var(--spacing-xs);
+  color: var(--text-muted);
+}
+
+.earnings-header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 58px;
+  width: 58px;
+  height: 58px;
+  color: var(--primary-dark);
+  font-size: var(--font-size-3xl);
+  background: var(--bg-light-blue);
+  border-radius: var(--radius-lg);
+}
+
+.earnings-alert,
+.earnings-cycle-alert,
+.earnings-loading {
+  margin-bottom: var(--spacing-lg);
+}
+
+.earnings-alert button {
+  padding: 0;
+  color: var(--primary-dark);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+}
+
+.earnings-loading,
+.earnings-panel {
+  padding: var(--spacing-lg);
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.earnings-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.earnings-summary-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.earnings-summary-icon {
+  grid-row: 1 / span 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: var(--primary-dark);
+  background: var(--bg-light-blue);
+  border-radius: var(--radius-md);
+}
+
+.earnings-summary-card > span:not(.earnings-summary-icon),
+.earnings-summary-card small {
+  color: var(--text-light);
+  font-size: var(--font-size-xs);
+}
+
+.earnings-summary-card strong {
+  color: var(--text-dark);
+  font-size: var(--font-size-xl);
+}
+
+.earnings-panel {
+  margin-bottom: var(--spacing-lg);
+}
+
+.earnings-panel-heading {
+  margin-bottom: var(--spacing-md);
+}
+
+.earnings-panel .ant-table-content {
+  overflow-x: auto;
+}
+
+.earnings-panel .ant-table {
+  min-width: 680px;
+}
+
+.earnings-panel-heading h3.ant-typography {
+  font-size: var(--font-size-xl);
+}
+
+.earning-class-cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+}
+
+.earnings-status,
+.earning-status {
+  margin: 0;
+  border-radius: var(--radius-full);
+}
+
+.earnings-status.is-draft,
+.earning-status.is-in_payout {
+  color: var(--color-warning);
+  background: var(--color-warning-light);
+  border-color: var(--color-warning);
+}
+
+.earnings-status.is-paid,
+.earning-status.is-settled,
+.earning-status.is-available {
+  color: var(--color-success);
+  background: var(--color-success-light);
+  border-color: var(--color-success);
+}
+
+.earning-status.is-pending {
+  color: var(--primary-dark);
+  background: var(--bg-light-blue);
+  border-color: var(--primary-light);
+}
+
+.earning-status.is-reversed,
+.earnings-status.is-void {
+  color: var(--color-error);
+  background: var(--color-error-light);
+  border-color: var(--color-error);
+}
+
+@media (max-width: 1100px) {
+  .earnings-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .earnings-header {
+    align-items: flex-start;
+    padding: var(--spacing-lg);
+  }
+
+  .earnings-header h1.ant-typography {
+    font-size: var(--font-size-3xl);
+  }
+
+  .earnings-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .earnings-panel {
+    padding: var(--spacing-md);
+  }
+}

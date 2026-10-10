@@ -97,6 +97,7 @@ export const API_ENDPOINTS = {
   DASHBOARD_OVERVIEW: "/partners/dashboard/overview",
   DASHBOARD_BOOKINGS: "/partners/dashboard/bookings",
   DASHBOARD_REVENUE: "/partners/dashboard/revenue",
+  PAYOUTS: "/partners/payouts",
 
   // Classes/Listings Management
   GET_ALL_LISTINGS: "/listings/partner",
@@ -120,6 +121,11 @@ export const API_ENDPOINTS = {
   GET_BOOKINGS_FOR_LISTING: (listingId) => `/bookings/listing/${listingId}`,
   CONFIRM_BOOKING: (bookingId) => `/bookings/${bookingId}/confirm`,
   CANCEL_BOOKING: (bookingId) => `/bookings/${bookingId}/cancel`,
+
+  // Make-up requests
+  GET_MAKEUP_REQUESTS: "/makeup-requests/partner",
+  RESPOND_MAKEUP_REQUEST: (requestId) =>
+    `/makeup-requests/${requestId}/respond`,
 
   // Outlets
   GET_OUTLETS: (partnerId) => `/partners/${partnerId}/outlets`,

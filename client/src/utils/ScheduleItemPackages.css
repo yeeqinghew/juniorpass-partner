@@ -50,6 +50,15 @@
   background: #fff1f0;
 }
 
+.remove-schedule-btn:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.locked-schedule-alert {
+  margin-bottom: var(--spacing-sm);
+}
+
 /* ── Dividers ────────────────────────────────────────────────────────────────── */
 .card-divider {
   margin: 12px 0 !important;

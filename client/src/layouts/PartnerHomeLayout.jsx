@@ -8,7 +8,9 @@ import {
   LogoutOutlined,
   MenuOutlined,
   QuestionCircleOutlined,
+  SwapOutlined,
   UserOutlined,
+  WalletOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -37,6 +39,12 @@ const getRouteMeta = (pathname) => {
   }
   if (pathname.startsWith("/outlets")) {
     return { key: "outlets", title: "Outlets", eyebrow: "Locations" };
+  }
+  if (pathname.startsWith("/earnings")) {
+    return { key: "earnings", title: "Earnings & payouts", eyebrow: "Finance" };
+  }
+  if (pathname.startsWith("/make-up-requests")) {
+    return { key: "make-up-requests", title: "Make-up requests", eyebrow: "Bookings" };
   }
   if (
     pathname.startsWith("/classes") ||
@@ -93,6 +101,16 @@ const PartnerHomeLayout = ({ setAuth }) => {
       key: "classes",
       icon: <BookOutlined />,
       label: <Link to="/classes">Classes</Link>,
+    },
+    {
+      key: "make-up-requests",
+      icon: <SwapOutlined />,
+      label: <Link to="/make-up-requests">Make-up requests</Link>,
+    },
+    {
+      key: "earnings",
+      icon: <WalletOutlined />,
+      label: <Link to="/earnings">Earnings & payouts</Link>,
     },
   ];
 

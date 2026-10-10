@@ -22,7 +22,12 @@ import {
   PlusOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import { useState, useEffect, useContext, useCallback, useMemo } from "react";
+import {
+  useEffect,
+  useContext,
+  useCallback,
+  useMemo,
+} from "react";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import TimeRangePicker from "./TimeRangePicker";
@@ -91,7 +96,7 @@ const calcShortTermPrice = (ltTotal, ltClasses, stClasses) => {
 
 // ─── sub-component: single time slot row ─────────────────────────────────────
 
-const TimeSlotRow = ({ slotIndex, remove, isOnly, isProgressive }) => (
+const TimeSlotRow = ({ slotIndex, remove, isOnly, isProgressive, locked }) => (
   <div className="time-slot-row">
     <div className="time-slot-fields">
       <Form.Item
@@ -99,7 +104,7 @@ const TimeSlotRow = ({ slotIndex, remove, isOnly, isProgressive }) => (
         rules={[{ required: true, message: "Day" }]}
         style={{ marginBottom: 0, flex: "1 1 130px" }}
       >
-        <Select placeholder="Day" size="large">
+        <Select placeholder="Day" size="large" disabled={locked}>
           {day.map((d) => (
             <Select.Option key={d} value={d}>
               {d}
@@ -113,7 +118,7 @@ const TimeSlotRow = ({ slotIndex, remove, isOnly, isProgressive }) => (
         rules={[{ required: true, message: "Time" }]}
         style={{ marginBottom: 0, flex: "1 1 180px" }}
       >
-        <TimeRangePicker />
+        <TimeRangePicker disabled={locked} />
       </Form.Item>
 
       {!isProgressive && (
@@ -131,12 +136,13 @@ const TimeSlotRow = ({ slotIndex, remove, isOnly, isProgressive }) => (
             max={100}
             size="large"
             className="capacity-input"
+            disabled={locked}
           />
         </Form.Item>
       )}
     </div>
 
-    {!isOnly && (
+    {!isOnly && !locked && (
       <button
         type="button"
         className="slot-remove-btn"
@@ -151,56 +157,69 @@ const TimeSlotRow = ({ slotIndex, remove, isOnly, isProgressive }) => (
 
 // ─── main component ───────────────────────────────────────────────────────────
 
-const ScheduleItemWithPackages = ({ field, outletIndex, remove, form }) => {
+const ScheduleItemWithPackages = ({
+  field,
+  outletIndex,
+  remove,
+  form,
+  locked = false,
+}) => {
   const { packageTypes: dbPackageTypes } = useContext(DataContext);
   const schedulePath = useMemo(
     () => ["outlets", outletIndex, "schedules", field.name],
     [field.name, outletIndex],
   );
-  const packageTypes =
-    Form.useWatch(
-      [...schedulePath, "package_types"],
-      form,
-    ) || [];
+  const watchedPackageTypes = Form.useWatch(
+    [...schedulePath, "package_types"],
+    form,
+  );
+  const packageTypes = useMemo(
+    () => watchedPackageTypes || [],
+    [watchedPackageTypes],
+  );
   // const [packageTypes, setPackageTypes] = useState([]);
   const isProgressive = Form.useWatch(
     [...schedulePath, "is_progressive"],
     form,
   );
-  const [ltTotal, setLtTotal] = useState(null); // full-term total price
-  const [ltClasses, setLtClasses] = useState(null);
+  const ltTotal = Form.useWatch([...schedulePath, "price_fullterm"], form);
+  const ltClasses = Form.useWatch(
+    [...schedulePath, "full_term_class_count"],
+    form,
+  );
 
   // Derived values
   const stClasses = ltClasses ? Math.ceil(ltClasses * 0.25) : null;
   const stPrice = calcShortTermPrice(ltTotal, ltClasses, stClasses);
 
-  // Sync form field for short-term calculated values
-  useEffect(() => {
-    // Grab current values from the form instance
-    const currentSchedule = form.getFieldValue([
-      ...schedulePath,
-    ]);
-
-    if (currentSchedule) {
-      if (currentSchedule.price_fullterm)
-        setLtTotal(currentSchedule.price_fullterm);
-      if (currentSchedule.full_term_class_count)
-        setLtClasses(currentSchedule.full_term_class_count);
-    }
-  }, [form, schedulePath]);
-
   // Persist the auto-calculated values in the hidden fields submitted by the
   // create/edit forms.
   useEffect(() => {
-    form.setFieldValue(
-      [...schedulePath, "short_term_class_count"],
-      stClasses,
-    );
-    form.setFieldValue(
-      [...schedulePath, "price_shortterm"],
-      stPrice,
-    );
-  }, [form, schedulePath, stClasses, stPrice]);
+    if (!locked) {
+      form.setFieldValue(
+        [...schedulePath, "short_term_class_count"],
+        stClasses,
+      );
+      form.setFieldValue(
+        [...schedulePath, "price_shortterm"],
+        stPrice,
+      );
+    }
+  }, [form, locked, schedulePath, stClasses, stPrice]);
+
+  const handleFullTermPriceChange = useCallback(
+    (value) => {
+      if (!locked || !packageTypes.includes("short-term")) return;
+      const shortTermClasses = ltClasses
+        ? Math.ceil(Number(ltClasses) * 0.25)
+        : null;
+      form.setFieldValue(
+        [...schedulePath, "price_shortterm"],
+        calcShortTermPrice(value, ltClasses, shortTermClasses),
+      );
+    },
+    [form, locked, ltClasses, packageTypes, schedulePath],
+  );
 
   const handleProgressiveChange = useCallback(
     (checked) => {
@@ -289,12 +308,23 @@ const ScheduleItemWithPackages = ({ field, outletIndex, remove, form }) => {
             className="remove-schedule-btn"
             onClick={() => remove(field.name)}
             aria-label="Remove schedule"
+            disabled={locked}
           >
             <MinusCircleOutlined /> Remove
           </button>
         </div>
 
         <Divider className="card-divider" />
+
+        {locked && (
+          <Alert
+            type="info"
+            showIcon
+            message="Enrolled schedule"
+            description="The schedule structure is locked to protect existing bookings. Price changes apply only to future purchases."
+            className="locked-schedule-alert"
+          />
+        )}
 
         {/* ── Schedule type ── */}
         <div className="section-block">
@@ -305,7 +335,7 @@ const ScheduleItemWithPackages = ({ field, outletIndex, remove, form }) => {
               valuePropName="checked"
               className="progressive-toggle-control"
             >
-              <Switch onChange={handleProgressiveChange} />
+              <Switch onChange={handleProgressiveChange} disabled={locked} />
             </Form.Item>
 
             <div className="progressive-toggle-copy">
@@ -348,6 +378,7 @@ const ScheduleItemWithPackages = ({ field, outletIndex, remove, form }) => {
               onChange={handlePackageChange}
               maxTagCount="responsive"
               optionLabelProp="label"
+              disabled={locked}
             >
               {dbPackageTypes &&
                 dbPackageTypes.map((pkg) => (
@@ -434,6 +465,7 @@ const ScheduleItemWithPackages = ({ field, outletIndex, remove, form }) => {
                 max={100}
                 size="large"
                 className="capacity-input"
+                disabled={locked}
               />
             </Form.Item>
           )}
@@ -449,6 +481,7 @@ const ScheduleItemWithPackages = ({ field, outletIndex, remove, form }) => {
                     remove={removeSlot}
                     isOnly={slotFields.length === 1}
                     isProgressive={isProgressive}
+                    locked={locked}
                   />
                 ))}
                 <Button
@@ -457,6 +490,7 @@ const ScheduleItemWithPackages = ({ field, outletIndex, remove, form }) => {
                   icon={<PlusOutlined />}
                   onClick={() => addSlot()}
                   className="add-slot-btn"
+                  disabled={locked}
                 >
                   Add another day / time
                 </Button>
@@ -480,6 +514,7 @@ const ScheduleItemWithPackages = ({ field, outletIndex, remove, form }) => {
                 placeholder="How often?"
                 size="large"
                 options={frequency.map((f) => ({ value: f, label: f }))}
+                disabled={locked}
               />
             </Form.Item>
 
@@ -518,6 +553,7 @@ const ScheduleItemWithPackages = ({ field, outletIndex, remove, form }) => {
                     disabledDate={(date) =>
                       date && date.startOf("day").isBefore(dayjs().startOf("day"))
                     }
+                    disabled={locked}
                   />
                 </Form.Item>
 
@@ -533,7 +569,7 @@ const ScheduleItemWithPackages = ({ field, outletIndex, remove, form }) => {
                     placeholder="e.g. 12"
                     size="large"
                     style={{ width: "100%" }}
-                    onChange={(v) => setLtClasses(v)}
+                    disabled={locked}
                   />
                 </Form.Item>
 
@@ -561,7 +597,7 @@ const ScheduleItemWithPackages = ({ field, outletIndex, remove, form }) => {
                     precision={2}
                     size="large"
                     style={{ width: "100%" }}
-                    onChange={(v) => setLtTotal(v)}
+                    onChange={handleFullTermPriceChange}
                   />
                 </Form.Item>
               </div>

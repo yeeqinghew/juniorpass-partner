@@ -4,7 +4,7 @@ import "./TimeRangePicker.css";
 
 const { RangePicker } = TimePicker;
 
-const TimeRangePicker = ({ value = [], onChange }) => {
+const TimeRangePicker = ({ value = [], onChange, disabled = false }) => {
   const formattedValues = value.length
     ? value.map((time) => (dayjs.isDayjs(time) ? time : dayjs(time, "HH:mm")))
     : [];
@@ -26,7 +26,7 @@ const TimeRangePicker = ({ value = [], onChange }) => {
       popupClassName="time-range-picker-popup"
       size="large"
       minuteStep={15}
-      style={{ width: "100%" }}
+      disabled={disabled}
     />
   );
 };
