@@ -11,6 +11,8 @@ import {
   SwapOutlined,
   UserOutlined,
   WalletOutlined,
+  StarOutlined,
+  PercentageOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -45,6 +47,12 @@ const getRouteMeta = (pathname) => {
   }
   if (pathname.startsWith("/make-up-requests")) {
     return { key: "make-up-requests", title: "Make-up requests", eyebrow: "Bookings" };
+  }
+  if (pathname.startsWith("/reviews")) {
+    return { key: "reviews", title: "Reviews", eyebrow: "Customer feedback" };
+  }
+  if (pathname.startsWith("/promotions")) {
+    return { key: "promotions", title: "Promotions", eyebrow: "Pricing" };
   }
   if (
     pathname.startsWith("/classes") ||
@@ -106,6 +114,16 @@ const PartnerHomeLayout = ({ setAuth }) => {
       key: "make-up-requests",
       icon: <SwapOutlined />,
       label: <Link to="/make-up-requests">Make-up requests</Link>,
+    },
+    {
+      key: "reviews",
+      icon: <StarOutlined />,
+      label: <Link to="/reviews">Reviews</Link>,
+    },
+    {
+      key: "promotions",
+      icon: <PercentageOutlined />,
+      label: <Link to="/promotions">Promotions</Link>,
     },
     {
       key: "earnings",

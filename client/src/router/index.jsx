@@ -18,6 +18,8 @@ import OutletsManagement from "../components/Outlets/OutletsManagement";
 import ForcePasswordChange from "../components/ForcePasswordChange";
 import Earnings from "../components/Earnings";
 import MakeupRequests from "../components/MakeupRequests";
+import Reviews from "../components/Reviews";
+import Promotions from "../components/Promotions";
 import { DataProvider } from "../hooks/DataContext";
 
 const Routers = () => {
@@ -79,6 +81,8 @@ const Routers = () => {
               <Route path="outlets" element={<OutletsManagement />} />
               <Route path="earnings" element={<Earnings />} />
               <Route path="make-up-requests" element={<MakeupRequests />} />
+              <Route path="reviews" element={<Reviews />} />
+              <Route path="promotions" element={<Promotions />} />
               <Route path="class/:listing_id" element={<Class />} />
               <Route path="class/:listing_id/edit" element={<EditClass />} />
               <Route path="create-class" element={<CreateClass />} />

@@ -1,0 +1,138 @@
+.partner-promotions-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.partner-promotions-header,
+.partner-promotions-panel {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  background: var(--bg-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.partner-promotions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xl);
+}
+
+.partner-promotions-header h1.ant-typography {
+  margin: 4px 0;
+}
+
+.partner-promotions-kicker {
+  color: var(--primary-dark);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.partner-promotions-panel {
+  min-height: 240px;
+  padding: var(--spacing-lg);
+}
+
+.partner-promotion-list {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.partner-promotion-card {
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+}
+
+.partner-promotion-card-heading,
+.partner-promotion-actions,
+.partner-promotion-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+.partner-promotion-card-heading > div,
+.partner-promotion-preview > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.partner-promotion-card-heading span,
+.partner-promotion-metrics span,
+.partner-promotion-preview span,
+.partner-promotion-preview small {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.partner-promotion-metrics,
+.partner-promotion-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-md);
+}
+
+.partner-promotion-metrics {
+  margin: var(--spacing-lg) 0;
+}
+
+.partner-promotion-metrics > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.partner-promotion-actions {
+  justify-content: flex-end;
+  margin-top: var(--spacing-md);
+}
+
+.partner-promotion-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-light-blue);
+  color: var(--primary-dark);
+}
+
+.partner-promotion-form-actions {
+  justify-content: flex-end;
+  margin-top: var(--spacing-lg);
+}
+
+.partner-promotion-modal .ant-picker,
+.partner-promotion-modal .ant-input-number {
+  width: 100%;
+}
+
+.partner-promotions-loading {
+  color: var(--text-muted);
+  text-align: center;
+}
+
+@media screen and (max-width: 767.9px) {
+  .partner-promotions-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .partner-promotion-metrics,
+  .partner-promotion-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .partner-promotions-header,
+  .partner-promotions-panel,
+  .partner-promotion-card {
+    padding: var(--spacing-md);
+  }
+}

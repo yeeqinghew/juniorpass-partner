@@ -127,6 +127,17 @@ export const API_ENDPOINTS = {
   RESPOND_MAKEUP_REQUEST: (requestId) =>
     `/makeup-requests/${requestId}/respond`,
 
+  // Reviews
+  GET_REVIEWS: "/reviews/partner/all",
+  REPLY_TO_REVIEW: (reviewId) => `/reviews/${reviewId}/reply`,
+
+  // Promotions
+  GET_PROMOTIONS: "/promotions/partner",
+  GET_PROMOTION_OPTIONS: "/promotions/partner/options",
+  CREATE_PROMOTION: "/promotions/partner",
+  UPDATE_PROMOTION_STATUS: (promotionId) =>
+    `/promotions/partner/${promotionId}/status`,
+
   // Outlets
   GET_OUTLETS: (partnerId) => `/partners/${partnerId}/outlets`,
   CREATE_OUTLET: "/outlets",

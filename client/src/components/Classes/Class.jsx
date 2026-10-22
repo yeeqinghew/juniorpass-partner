@@ -795,6 +795,62 @@ const Class = () => {
     },
   ];
 
+  const renderStudentSafetyDetails = (student) => {
+    const pickups = Array.isArray(student.authorized_pickups)
+      ? student.authorized_pickups
+      : [];
+
+    return (
+      <div className="student-safety-panel">
+        <div className="student-safety-heading">
+          <SafetyCertificateOutlined />
+          <div>
+            <strong>Child safety information</strong>
+            <span>
+              Last updated {student.safety_updated_at
+                ? new Date(student.safety_updated_at).toLocaleDateString()
+                : "date unavailable"}
+            </span>
+          </div>
+        </div>
+        <div className="student-safety-grid">
+          <section>
+            <h4>Emergency contact</h4>
+            <p>{student.emergency_contact_name || "Not provided"}</p>
+            <span>
+              {[student.emergency_contact_relationship, student.emergency_contact_phone]
+                .filter(Boolean)
+                .join(" · ") || "Contact details unavailable"}
+            </span>
+          </section>
+          <section>
+            <h4>Allergies, medical and care notes</h4>
+            <p>{student.child_safety_notes || "None declared"}</p>
+          </section>
+          <section className="student-safety-pickups">
+            <h4>Authorised pickup people</h4>
+            {pickups.length > 0 ? (
+              <ul>
+                {pickups.map((pickup, index) => (
+                  <li key={`${pickup.name}-${index}`}>
+                    <strong>{pickup.name}</strong>
+                    <span>
+                      {[pickup.relationship, pickup.phone]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>Not provided</p>
+            )}
+          </section>
+        </div>
+      </div>
+    );
+  };
+
   // Students Tab Content
   const StudentsTab = () => {
     const groupedStudents = getStudentsGroupedByDate();
@@ -879,6 +935,15 @@ const Class = () => {
                       pagination={false}
                       size="small"
                       className={isPast ? "opacity-70" : ""}
+                      expandable={{
+                        expandedRowRender: renderStudentSafetyDetails,
+                        rowExpandable: (record) =>
+                          Boolean(
+                            record.emergency_contact_name ||
+                              record.child_safety_notes ||
+                              record.authorized_pickups?.length,
+                          ),
+                      }}
                     />
                   </div>
                 );
