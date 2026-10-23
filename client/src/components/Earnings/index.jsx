@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
-import { Alert, Empty, Skeleton, Table, Tag, Typography } from "antd";
+import { Alert, Button, Empty, Skeleton, Table, Tag, Typography } from "antd";
 import {
   CalendarOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
   DollarOutlined,
+  DownloadOutlined,
+  FileTextOutlined,
   WalletOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -50,6 +52,30 @@ const Earnings = () => {
   useEffect(() => {
     loadEarnings();
   }, [loadEarnings]);
+
+  const openStatement = async (payout, format = "") => {
+    const previewWindow = format ? null : window.open("", "_blank");
+    try {
+      const response = await fetchWithAuth(
+        API_ENDPOINTS.PAYOUT_STATEMENT(payout.payout_id, format),
+      );
+      if (!response.ok) throw new Error("Unable to download payout statement");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      if (format) {
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = `juniorpass-payout-${payout.payout_id}.${format}`;
+        anchor.click();
+      } else if (previewWindow) {
+        previewWindow.location = url;
+      }
+      window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch (requestError) {
+      previewWindow?.close();
+      setError(requestError.message);
+    }
+  };
 
   const summaryCards = [
     {
@@ -105,6 +131,20 @@ const Earnings = () => {
       dataIndex: "transfer_reference",
       key: "reference",
       render: (value) => value || "—",
+    },
+    {
+      title: "Statement",
+      key: "statement",
+      render: (_, payout) => (
+        <div className="earnings-statement-actions">
+          <Button size="small" icon={<FileTextOutlined />} onClick={() => openStatement(payout)}>
+            View
+          </Button>
+          <Button size="small" icon={<DownloadOutlined />} onClick={() => openStatement(payout, "csv")}>
+            CSV
+          </Button>
+        </div>
+      ),
     },
   ];
 

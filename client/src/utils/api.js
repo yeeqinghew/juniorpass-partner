@@ -97,7 +97,9 @@ export const API_ENDPOINTS = {
   DASHBOARD_OVERVIEW: "/partners/dashboard/overview",
   DASHBOARD_BOOKINGS: "/partners/dashboard/bookings",
   DASHBOARD_REVENUE: "/partners/dashboard/revenue",
-  PAYOUTS: "/partners/payouts",
+  PAYOUTS: "/payouts/partner",
+  PAYOUT_STATEMENT: (payoutId, format = "") =>
+    `/payouts/${payoutId}/statement${format ? `.${format}` : ""}`,
 
   // Classes/Listings Management
   GET_ALL_LISTINGS: "/listings/partner",

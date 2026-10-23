@@ -146,6 +146,12 @@
   min-width: 180px;
 }
 
+.earnings-statement-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  min-width: 130px;
+}
+
 .earnings-status,
 .earning-status {
   margin: 0;
