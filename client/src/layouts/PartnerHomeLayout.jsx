@@ -13,6 +13,7 @@ import {
   WalletOutlined,
   StarOutlined,
   PercentageOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -47,6 +48,9 @@ const getRouteMeta = (pathname) => {
   }
   if (pathname.startsWith("/make-up-requests")) {
     return { key: "make-up-requests", title: "Make-up requests", eyebrow: "Bookings" };
+  }
+  if (pathname.startsWith("/sessions")) {
+    return { key: "sessions", title: "Session management", eyebrow: "Bookings" };
   }
   if (pathname.startsWith("/reviews")) {
     return { key: "reviews", title: "Reviews", eyebrow: "Customer feedback" };
@@ -145,6 +149,11 @@ const PartnerHomeLayout = ({ setAuth }) => {
       key: "make-up-requests",
       icon: <SwapOutlined />,
       label: <Link to="/make-up-requests">Make-up requests</Link>,
+    },
+    {
+      key: "sessions",
+      icon: <CalendarOutlined />,
+      label: <Link to="/sessions">Sessions</Link>,
     },
     {
       key: "reviews",

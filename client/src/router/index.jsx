@@ -21,6 +21,7 @@ import MakeupRequests from "../components/MakeupRequests";
 import Reviews from "../components/Reviews";
 import Promotions from "../components/Promotions";
 import Notifications from "../components/Notifications";
+import SessionManagement from "../components/SessionManagement";
 import { DataProvider } from "../hooks/DataContext";
 
 const Routers = () => {
@@ -82,6 +83,7 @@ const Routers = () => {
               <Route path="outlets" element={<OutletsManagement />} />
               <Route path="earnings" element={<Earnings />} />
               <Route path="make-up-requests" element={<MakeupRequests />} />
+              <Route path="sessions" element={<SessionManagement />} />
               <Route path="reviews" element={<Reviews />} />
               <Route path="promotions" element={<Promotions />} />
               <Route path="notifications" element={<Notifications />} />

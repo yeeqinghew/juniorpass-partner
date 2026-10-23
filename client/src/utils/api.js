@@ -122,6 +122,11 @@ export const API_ENDPOINTS = {
   CONFIRM_BOOKING: (bookingId) => `/bookings/${bookingId}/confirm`,
   CANCEL_BOOKING: (bookingId) => `/bookings/${bookingId}/cancel`,
 
+  // Session management
+  GET_PARTNER_SESSIONS: "/class-occurrences/partner/sessions",
+  CHANGE_PARTNER_SESSION: (action) =>
+    `/class-occurrences/partner/sessions/${action}`,
+
   // Make-up requests
   GET_MAKEUP_REQUESTS: "/makeup-requests/partner",
   RESPOND_MAKEUP_REQUEST: (requestId) =>
