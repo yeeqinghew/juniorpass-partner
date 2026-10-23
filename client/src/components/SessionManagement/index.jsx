@@ -16,9 +16,12 @@ import {
   CalendarOutlined,
   ClockCircleOutlined,
   EnvironmentOutlined,
+  LeftOutlined,
+  RightOutlined,
   StopOutlined,
   SwapOutlined,
   TeamOutlined,
+  UnorderedListOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import toast from "react-hot-toast";
@@ -61,6 +64,123 @@ const statusLabel = (session) => {
   return "Scheduled";
 };
 
+const SessionCalendarEvent = ({ session, onSelect }) => (
+  <button
+    type="button"
+    className={`session-calendar-event is-${session.status}${session.is_makeup ? " is-makeup" : ""}`}
+    onClick={() => onSelect(session)}
+    title={`${session.listing_title} · ${formatTime(session.scheduled_date, session.scheduled_end_date)} · ${session.outlet_name || "Outlet"}`}
+  >
+    <time>{dayjs(session.scheduled_date).format("h:mm A")}</time>
+    <span>{session.listing_title}</span>
+  </button>
+);
+
+const OperationsCalendar = ({
+  sessions,
+  mode,
+  cursor,
+  onCursorChange,
+  onSelectSession,
+  onShowWeek,
+}) => {
+  const sessionsByDay = useMemo(
+    () =>
+      sessions.reduce((grouped, session) => {
+        const key = dayjs(session.scheduled_date).format("YYYY-MM-DD");
+        grouped.set(key, [...(grouped.get(key) || []), session]);
+        return grouped;
+      }, new Map()),
+    [sessions],
+  );
+
+  const start =
+    mode === "month"
+      ? cursor.startOf("month").startOf("week")
+      : cursor.startOf("week");
+  const dayCount = mode === "month" ? 42 : 7;
+  const days = Array.from({ length: dayCount }, (_, index) =>
+    start.add(index, "day"),
+  );
+  const title =
+    mode === "month"
+      ? cursor.format("MMMM YYYY")
+      : `${start.format("D MMM")} – ${start.add(6, "day").format("D MMM YYYY")}`;
+  const moveCursor = (amount) =>
+    onCursorChange(cursor.add(amount, mode === "month" ? "month" : "week"));
+
+  return (
+    <div className={`operations-calendar is-${mode}`}>
+      <div className="operations-calendar-header">
+        <div>
+          <Text className="session-kicker">Operations calendar</Text>
+          <Title level={3}>{title}</Title>
+        </div>
+        <div className="operations-calendar-navigation">
+          <Button onClick={() => onCursorChange(dayjs())}>Today</Button>
+          <Button
+            icon={<LeftOutlined />}
+            aria-label={`Previous ${mode}`}
+            onClick={() => moveCursor(-1)}
+          />
+          <Button
+            icon={<RightOutlined />}
+            aria-label={`Next ${mode}`}
+            onClick={() => moveCursor(1)}
+          />
+        </div>
+      </div>
+
+      <div className="operations-calendar-grid" role="grid" aria-label={`${mode} operations calendar`}>
+        {days.slice(0, 7).map((day) => (
+          <div className="operations-calendar-weekday" role="columnheader" key={`weekday-${day.format("ddd")}`}>
+            {day.format("ddd")}
+          </div>
+        ))}
+        {days.map((day) => {
+          const daySessions = sessionsByDay.get(day.format("YYYY-MM-DD")) || [];
+          const visibleDaySessions = mode === "month" ? daySessions.slice(0, 3) : daySessions;
+          const isOutsideMonth = mode === "month" && !day.isSame(cursor, "month");
+          return (
+            <div
+              className={`operations-calendar-day${isOutsideMonth ? " is-outside" : ""}${day.isSame(dayjs(), "day") ? " is-today" : ""}`}
+              role="gridcell"
+              aria-label={`${day.format("D MMMM YYYY")}, ${daySessions.length} sessions`}
+              key={day.format("YYYY-MM-DD")}
+            >
+              <div className="operations-calendar-day-heading">
+                {mode === "week" && <span>{day.format("MMM")}</span>}
+                <strong>{day.format("D")}</strong>
+              </div>
+              <div className="operations-calendar-events">
+                {visibleDaySessions.map((session) => (
+                  <SessionCalendarEvent
+                    key={`${session.schedule_id}-${session.scheduled_date}`}
+                    session={session}
+                    onSelect={onSelectSession}
+                  />
+                ))}
+                {mode === "month" && daySessions.length > 3 && (
+                  <button
+                    type="button"
+                    className="operations-calendar-more"
+                    onClick={() => onShowWeek(day)}
+                  >
+                    +{daySessions.length - 3} more
+                  </button>
+                )}
+                {mode === "week" && daySessions.length === 0 && (
+                  <span className="operations-calendar-empty">No sessions</span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const SessionManagement = () => {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -68,6 +188,11 @@ const SessionManagement = () => {
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("upcoming");
   const [search, setSearch] = useState("");
+  const [classFilter, setClassFilter] = useState("all");
+  const [outletFilter, setOutletFilter] = useState("all");
+  const [view, setView] = useState("list");
+  const [calendarCursor, setCalendarCursor] = useState(dayjs());
+  const [selectedSession, setSelectedSession] = useState(null);
   const [change, setChange] = useState(null);
   const [form] = Form.useForm();
 
@@ -92,6 +217,27 @@ const SessionManagement = () => {
     loadSessions();
   }, [loadSessions]);
 
+  const classOptions = useMemo(() => {
+    const options = new Map();
+    sessions.forEach((session) => {
+      options.set(session.listing_id, session.listing_title);
+    });
+    return [
+      { value: "all", label: "All classes" },
+      ...[...options.entries()]
+        .map(([value, label]) => ({ value, label }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    ];
+  }, [sessions]);
+
+  const outletOptions = useMemo(() => {
+    const outlets = [...new Set(sessions.map((session) => session.outlet_name).filter(Boolean))];
+    return [
+      { value: "all", label: "All outlets" },
+      ...outlets.sort().map((outlet) => ({ value: outlet, label: outlet })),
+    ];
+  }, [sessions]);
+
   const visibleSessions = useMemo(() => {
     const query = search.trim().toLowerCase();
     return sessions.filter((session) => {
@@ -109,12 +255,20 @@ const SessionManagement = () => {
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
-      return matchesFilter && (!query || searchable.includes(query));
+      const matchesClass = classFilter === "all" || session.listing_id === classFilter;
+      const matchesOutlet = outletFilter === "all" || session.outlet_name === outletFilter;
+      return (
+        matchesFilter &&
+        matchesClass &&
+        matchesOutlet &&
+        (!query || searchable.includes(query))
+      );
     });
-  }, [filter, search, sessions]);
+  }, [classFilter, filter, outletFilter, search, sessions]);
 
   const openChange = (session, action) => {
     form.resetFields();
+    setSelectedSession(null);
     setChange({ session, action });
   };
 
@@ -192,6 +346,35 @@ const SessionManagement = () => {
       )}
 
       <section className="session-workspace">
+        <div className="session-workspace-heading">
+          <div>
+            <Text className="session-kicker">Schedule workspace</Text>
+            <Title level={3}>{visibleSessions.length} sessions</Title>
+          </div>
+          <div className="session-view-controls" role="group" aria-label="Session view">
+            <Button
+              type={view === "list" ? "primary" : "default"}
+              icon={<UnorderedListOutlined />}
+              onClick={() => setView("list")}
+            >
+              List
+            </Button>
+            <Button
+              type={view === "month" ? "primary" : "default"}
+              icon={<CalendarOutlined />}
+              onClick={() => setView("month")}
+            >
+              Month
+            </Button>
+            <Button
+              type={view === "week" ? "primary" : "default"}
+              icon={<CalendarOutlined />}
+              onClick={() => setView("week")}
+            >
+              Week
+            </Button>
+          </div>
+        </div>
         <div className="session-toolbar">
           <Input.Search
             allowClear
@@ -200,6 +383,22 @@ const SessionManagement = () => {
             placeholder="Search class or outlet"
             aria-label="Search class sessions"
             className="session-search"
+          />
+          <Select
+            value={classFilter}
+            onChange={setClassFilter}
+            aria-label="Filter by class"
+            className="session-class-filter"
+            options={classOptions}
+            showSearch
+            optionFilterProp="label"
+          />
+          <Select
+            value={outletFilter}
+            onChange={setOutletFilter}
+            aria-label="Filter by outlet"
+            className="session-outlet-filter"
+            options={outletOptions}
           />
           <Select
             value={filter}
@@ -219,6 +418,18 @@ const SessionManagement = () => {
           <div className="session-loading"><Skeleton active /></div>
         ) : visibleSessions.length === 0 ? (
           <Empty description="No class sessions in this view" />
+        ) : view !== "list" ? (
+          <OperationsCalendar
+            sessions={visibleSessions}
+            mode={view}
+            cursor={calendarCursor}
+            onCursorChange={setCalendarCursor}
+            onSelectSession={setSelectedSession}
+            onShowWeek={(day) => {
+              setCalendarCursor(day);
+              setView("week");
+            }}
+          />
         ) : (
           <div className="session-list">
             {visibleSessions.map((session) => {
@@ -290,6 +501,69 @@ const SessionManagement = () => {
           </div>
         )}
       </section>
+
+      <Modal
+        open={Boolean(selectedSession)}
+        onCancel={() => setSelectedSession(null)}
+        footer={null}
+        centered
+        title="Session details"
+        className="session-detail-modal"
+      >
+        <div className="session-detail-heading">
+          <div>
+            <Text className="session-kicker">{statusLabel(selectedSession || {})}</Text>
+            <Title level={3}>{selectedSession?.listing_title}</Title>
+          </div>
+          {selectedSession && (
+            <Tag className={`session-status is-${selectedSession.status}`}>
+              {statusLabel(selectedSession)}
+            </Tag>
+          )}
+        </div>
+        <dl className="session-detail-grid">
+          <div><dt>Date</dt><dd>{formatDate(selectedSession?.scheduled_date)}</dd></div>
+          <div><dt>Time</dt><dd>{formatTime(selectedSession?.scheduled_date, selectedSession?.scheduled_end_date)}</dd></div>
+          <div><dt>Outlet</dt><dd>{selectedSession?.outlet_name || "Outlet unavailable"}</dd></div>
+          <div><dt>Affected families</dt><dd>{selectedSession?.affected_children} children · {selectedSession?.affected_families} families</dd></div>
+        </dl>
+        {selectedSession?.cancellation_reason && (
+          <div className="session-cancellation-note">
+            <StopOutlined />
+            <span>{selectedSession.cancellation_reason}</span>
+          </div>
+        )}
+        <div className="session-detail-actions">
+          {selectedSession?.status === "cancelled" ? (
+            <Button
+              type="primary"
+              icon={<SwapOutlined />}
+              disabled={selectedSession.has_makeup}
+              onClick={() => openChange(selectedSession, "makeup")}
+            >
+              {selectedSession.has_makeup ? "Make-up scheduled" : "Add make-up"}
+            </Button>
+          ) : (
+            <>
+              <Button
+                icon={<SwapOutlined />}
+                disabled={dayjs(selectedSession?.scheduled_end_date).isBefore(dayjs())}
+                onClick={() => openChange(selectedSession, "reschedule")}
+              >
+                Reschedule
+              </Button>
+              <Button
+                danger
+                icon={<StopOutlined />}
+                disabled={dayjs(selectedSession?.scheduled_end_date).isBefore(dayjs())}
+                onClick={() => openChange(selectedSession, "cancel")}
+              >
+                Cancel session
+              </Button>
+            </>
+          )}
+        </div>
+      </Modal>
 
       <Modal
         open={Boolean(change)}
