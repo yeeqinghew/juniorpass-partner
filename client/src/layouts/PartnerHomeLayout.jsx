@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import {
   AppstoreOutlined,
   BellOutlined,
@@ -54,6 +54,9 @@ const getRouteMeta = (pathname) => {
   if (pathname.startsWith("/promotions")) {
     return { key: "promotions", title: "Promotions", eyebrow: "Pricing" };
   }
+  if (pathname.startsWith("/notifications")) {
+    return { key: "notifications", title: "Notifications", eyebrow: "Updates" };
+  }
   if (
     pathname.startsWith("/classes") ||
     pathname.startsWith("/class/") ||
@@ -70,13 +73,41 @@ const PartnerHomeLayout = ({ setAuth }) => {
   const location = useLocation();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const routeMeta = getRouteMeta(location.pathname);
+
+  const loadUnreadNotifications = useCallback(async () => {
+    try {
+      const response = await fetchWithAuth(API_ENDPOINTS.GET_UNREAD_COUNT);
+      if (!response.ok) return;
+      const data = await response.json();
+      setUnreadNotifications(Number(data.unread_count || 0));
+    } catch (error) {
+      console.error("Unable to load notification count:", error);
+    }
+  }, []);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    loadUnreadNotifications();
+    const refreshTimer = window.setInterval(loadUnreadNotifications, 60000);
+    window.addEventListener(
+      "partner-notifications-updated",
+      loadUnreadNotifications,
+    );
+    return () => {
+      window.clearInterval(refreshTimer);
+      window.removeEventListener(
+        "partner-notifications-updated",
+        loadUnreadNotifications,
+      );
+    };
+  }, [loadUnreadNotifications, location.pathname]);
 
   const handleLogout = async () => {
     try {
@@ -241,13 +272,13 @@ const PartnerHomeLayout = ({ setAuth }) => {
           </div>
 
           <div className="topbar-actions">
-            <Tooltip title="Notifications coming soon">
-              <Badge count={0} size="small">
+            <Tooltip title="Notifications">
+              <Badge count={unreadNotifications} overflowCount={99} size="small">
                 <Button
                   type="text"
                   icon={<BellOutlined />}
                   className="topbar-icon-button"
-                  onClick={() => toast("Notifications are coming soon")}
+                  onClick={() => navigate("/notifications")}
                   aria-label="Notifications"
                 />
               </Badge>

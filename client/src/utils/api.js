@@ -152,10 +152,10 @@ export const API_ENDPOINTS = {
   DELETE_MEDIA: "/media/delete",
 
   // Notifications
-  GET_NOTIFICATIONS: "/notifications/partner",
-  GET_UNREAD_COUNT: "/notifications/partner/unread-count",
+  GET_NOTIFICATIONS: "/notifications?type=partner",
+  GET_UNREAD_COUNT: "/notifications/unread-count?type=partner",
   MARK_NOTIFICATION_READ: (notificationId) => `/notifications/${notificationId}/read`,
-  MARK_ALL_NOTIFICATIONS_READ: "/notifications/partner/mark-all-read",
+  MARK_ALL_NOTIFICATIONS_READ: "/notifications/read-all",
 
   // Miscellaneous
   GET_ALL_CATEGORIES: "/categories",

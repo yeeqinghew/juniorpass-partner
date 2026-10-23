@@ -20,6 +20,7 @@ import Earnings from "../components/Earnings";
 import MakeupRequests from "../components/MakeupRequests";
 import Reviews from "../components/Reviews";
 import Promotions from "../components/Promotions";
+import Notifications from "../components/Notifications";
 import { DataProvider } from "../hooks/DataContext";
 
 const Routers = () => {
@@ -83,6 +84,7 @@ const Routers = () => {
               <Route path="make-up-requests" element={<MakeupRequests />} />
               <Route path="reviews" element={<Reviews />} />
               <Route path="promotions" element={<Promotions />} />
+              <Route path="notifications" element={<Notifications />} />
               <Route path="class/:listing_id" element={<Class />} />
               <Route path="class/:listing_id/edit" element={<EditClass />} />
               <Route path="create-class" element={<CreateClass />} />
