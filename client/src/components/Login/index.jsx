@@ -7,7 +7,7 @@ import {
   ArrowRightOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
-import { Button, Form, Input, Checkbox, Card, Typography } from "antd";
+import { Button, Form, Input, Card, Typography } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { fetchWithAuth, API_ENDPOINTS } from "../../utils/api";
@@ -86,9 +86,6 @@ const PartnerLogin = ({ setAuth }) => {
             <Form
               name="partner_login"
               className="partner-login-form"
-              initialValues={{
-                remember: true,
-              }}
               onFinish={handleLogin}
               layout="vertical"
               requiredMark={false}
@@ -137,12 +134,7 @@ const PartnerLogin = ({ setAuth }) => {
                 />
               </Form.Item>
 
-              <div className="form-options">
-                <div className="remember-checkbox">
-                  <Form.Item name="remember" valuePropName="checked" noStyle>
-                    <Checkbox>Remember me</Checkbox>
-                  </Form.Item>
-                </div>
+              <div className="forgot-password-row">
                 <Link to="/reset-password" className="forgot-password-link">
                   Forgot password?
                 </Link>

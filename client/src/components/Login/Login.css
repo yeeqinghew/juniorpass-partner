@@ -124,14 +124,13 @@
   color: #777777;
 }
 
-.form-options {
+.forgot-password-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin: 2px 0 24px;
 }
 
-.remember-checkbox .ant-checkbox-wrapper,
 .forgot-password-link {
   color: #777777;
   font-size: 10px;
@@ -144,11 +143,6 @@
 
 .forgot-password-link:hover {
   color: #5f9bbb;
-}
-
-.remember-checkbox .ant-checkbox-checked .ant-checkbox-inner {
-  background: #98BDD2;
-  border-color: #98BDD2;
 }
 
 .login-button {
