@@ -179,7 +179,7 @@ const Earnings = () => {
           <Text className="earnings-kicker">Finance</Text>
           <Title level={1}>Earnings & payouts</Title>
           <Text className="earnings-subtitle">
-            Track delivered class earnings and your monthly JuniorPASS transfers.
+            Track delivered class earnings and your monthly Junior Pass transfers.
           </Text>
         </div>
         <div className="earnings-header-icon" aria-hidden="true">
@@ -217,7 +217,7 @@ const Earnings = () => {
             type="info"
             showIcon
             message={`Next settlement cycle: ${date(data.next_settlement_date)}`}
-            description="Completed classes become available for the next monthly settlement. JuniorPASS records the transfer after it is sent."
+            description="Completed classes become available for the next monthly settlement. Junior Pass records the transfer after it is sent."
             className="earnings-cycle-alert"
           />
 

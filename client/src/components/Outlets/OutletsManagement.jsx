@@ -179,7 +179,7 @@ const OutletsManagement = () => {
         <div className="location-card-body">
           <div className="location-card-heading">
             <div>
-              <Text className="location-card-kicker">JuniorPASS location</Text>
+              <Text className="location-card-kicker">Junior Pass location</Text>
               <Title level={4} className="location-card-title">
                 {outlet.outlet_name || "Unnamed outlet"}
               </Title>

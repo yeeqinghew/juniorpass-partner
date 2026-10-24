@@ -95,7 +95,7 @@ const Reviews = () => {
                   <Alert
                     type="warning"
                     showIcon
-                    message="Hidden by JuniorPASS"
+                    message="Hidden by Junior Pass"
                     description={review.moderation_reason}
                   />
                 ) : null}

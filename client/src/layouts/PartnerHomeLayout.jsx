@@ -224,12 +224,12 @@ const PartnerHomeLayout = ({ setAuth }) => {
         </span>
         <div>
           <Text className="sidebar-support-title">Need a hand?</Text>
-          <a href="mailto:admin@juniorpass.sg">Contact JuniorPASS</a>
+          <a href="mailto:admin@juniorpass.sg">Contact Junior Pass</a>
         </div>
       </div>
 
       <Text className="sidebar-footer-text">
-        © {new Date().getFullYear()} JuniorPASS
+        © {new Date().getFullYear()} Junior Pass
       </Text>
     </div>
   );

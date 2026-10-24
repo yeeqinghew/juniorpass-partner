@@ -1,5 +1,5 @@
 /**
- * API Configuration for JuniorPASS Partner Portal
+ * API Configuration for Junior Pass Partner Portal
  * Centralized API management with authentication
  */
 import { AUTH_ROLES } from "../constants/auth";

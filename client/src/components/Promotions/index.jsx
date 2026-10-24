@@ -158,7 +158,7 @@ const Promotions = () => {
         <div>
           <Text className="partner-promotions-kicker">Campaign pricing</Text>
           <Title level={1}>Promotions</Title>
-          <Text>Create limited offers for JuniorPASS approval.</Text>
+          <Text>Create limited offers for Junior Pass approval.</Text>
         </div>
         <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreating(true)}>
           New promotion
@@ -298,7 +298,7 @@ const Promotions = () => {
           <Alert
             type="info"
             showIcon
-            message="JuniorPASS approval required"
+            message="Junior Pass approval required"
             description="Admin will confirm whether the partner or platform funds the discount before it becomes visible."
           />
           <div className="partner-promotion-form-actions">
