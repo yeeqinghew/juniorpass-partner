@@ -272,12 +272,6 @@ const PartnerHomeLayout = ({ setAuth }) => {
                 aria-label="Open navigation"
               />
             )}
-            <div className="topbar-page-context">
-              <Text className="topbar-eyebrow">{routeMeta.eyebrow}</Text>
-              <Title level={4} className="topbar-title">
-                {routeMeta.title}
-              </Title>
-            </div>
           </div>
 
           <div className="topbar-actions">

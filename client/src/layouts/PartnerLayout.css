@@ -214,27 +214,6 @@
   gap: 10px;
 }
 
-.topbar-page-context {
-  display: flex;
-  flex-direction: column;
-}
-
-.topbar-eyebrow {
-  color: #999999 !important;
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.topbar-title {
-  margin: 2px 0 0 !important;
-  color: #1a1a2e !important;
-  font-size: 20px !important;
-  line-height: 1.2 !important;
-}
-
 .topbar-actions {
   gap: 10px;
 }
@@ -329,15 +308,9 @@
     padding: 0 16px !important;
   }
 
-  .topbar-eyebrow,
   .topbar-account,
   .topbar-actions .ant-badge {
     display: none;
-  }
-
-  .topbar-title {
-    margin-top: 0 !important;
-    font-size: 17px !important;
   }
 
   .topbar-actions {

@@ -1,0 +1,268 @@
+/* Shared authenticated-workspace layout. Page CSS owns its content; this file
+   owns the outer rhythm so portal tabs feel like one product. */
+.partner-content .classes-container,
+.partner-content .outlets-management-inner,
+.partner-content .profile-content,
+.partner-content .earnings-page,
+.partner-content .makeup-page,
+.partner-content .partner-reviews-page,
+.partner-content .partner-promotions-page,
+.partner-content .partner-notifications-page,
+.partner-content .session-page {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.partner-content > .profile-container {
+  padding: 0;
+}
+
+.partner-content .classes-container,
+.partner-content .profile-content,
+.partner-content .earnings-page,
+.partner-content .makeup-page,
+.partner-content .partner-reviews-page,
+.partner-content .partner-promotions-page,
+.partner-content .partner-notifications-page,
+.partner-content .session-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.partner-content .classes-page-header,
+.partner-content .outlets-header,
+.partner-content .profile-header,
+.partner-content .earnings-header,
+.partner-content .makeup-header,
+.partner-content .partner-reviews-header,
+.partner-content .partner-promotions-header,
+.partner-content .partner-notifications-header,
+.partner-content .session-page-header {
+  margin: 0 !important;
+  padding: 28px 32px !important;
+  border-radius: var(--radius-xl);
+}
+
+.partner-content .classes-page-header,
+.partner-content .outlets-header,
+.partner-content .profile-header,
+.partner-content .earnings-header,
+.partner-content .makeup-header,
+.partner-content .partner-reviews-header,
+.partner-content .partner-promotions-header,
+.partner-content .partner-notifications-header,
+.partner-content .session-page-header {
+  background: var(--bg-white) !important;
+  border: 1px solid var(--border-light) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.partner-content .welcome-title,
+.partner-content .outlets-title,
+.partner-content .profile-title,
+.partner-content .earnings-header h1.ant-typography,
+.partner-content .makeup-header h1.ant-typography,
+.partner-content .partner-reviews-header h1.ant-typography,
+.partner-content .partner-promotions-header h1.ant-typography,
+.partner-content .partner-notifications-header h1.ant-typography,
+.partner-content .session-page-header h1.ant-typography {
+  margin: 0 0 6px !important;
+  color: var(--text-dark) !important;
+  font-size: var(--font-size-4xl) !important;
+  font-weight: var(--font-weight-bold) !important;
+  line-height: var(--line-height-snug) !important;
+}
+
+.partner-content .page-kicker,
+.partner-content .outlets-kicker,
+.partner-content .profile-kicker,
+.partner-content .earnings-kicker,
+.partner-content .makeup-kicker,
+.partner-content .partner-reviews-kicker,
+.partner-content .partner-promotions-kicker,
+.partner-content .partner-notifications-kicker,
+.partner-content .session-kicker {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--primary-dark) !important;
+  font-size: var(--font-size-xs) !important;
+  font-weight: var(--font-weight-bold) !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase;
+}
+
+.partner-content .welcome-text,
+.partner-content .outlets-subtitle,
+.partner-content .profile-subtitle,
+.partner-content .earnings-subtitle,
+.partner-content .makeup-subtitle,
+.partner-content .session-page-subtitle,
+.partner-content .partner-notifications-header > div > .ant-typography:last-child,
+.partner-content .partner-promotions-header > div > .ant-typography:last-child,
+.partner-content .partner-reviews-header > div > .ant-typography:last-child {
+  display: block;
+  margin: 0 !important;
+  color: var(--text-muted) !important;
+  font-size: var(--font-size-sm) !important;
+  line-height: var(--line-height-normal);
+}
+
+.partner-content .earnings-header-icon,
+.partner-content .makeup-header-icon,
+.partner-content .partner-reviews-header-icon,
+.partner-content .partner-notifications-header-icon,
+.partner-content .session-header-icon {
+  width: 42px;
+  height: 42px;
+  flex-basis: 42px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xl);
+}
+
+.partner-content .classes-catalogue-panel,
+.partner-content .outlets-directory,
+.partner-content .earnings-panel,
+.partner-content .makeup-panel,
+.partner-content .partner-reviews-panel,
+.partner-content .partner-promotions-panel,
+.partner-content .partner-notifications-panel,
+.partner-content .session-workspace {
+  margin: 0 !important;
+  border-radius: var(--radius-xl);
+}
+
+/* Shared summary-card treatment for catalogue, finance, and dashboard metrics. */
+.partner-content .earnings-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--spacing-md);
+  margin: 0;
+}
+
+.partner-content .earnings-summary-card,
+.partner-content .dashboard-stat-card {
+  min-height: 124px;
+  padding: var(--spacing-lg);
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.partner-content .earnings-summary-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.partner-content .earnings-summary-icon,
+.partner-content .dashboard-stat-icon {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-md);
+}
+
+.partner-content .earnings-summary-card strong,
+.partner-content .dashboard-stat-value {
+  margin: 0;
+  color: var(--text-dark);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+.partner-content .earnings-summary-card > span:not(.earnings-summary-icon),
+.partner-content .dashboard-stat-label {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.partner-content .earnings-summary-card small,
+.partner-content .dashboard-stat-detail {
+  color: var(--text-light);
+  font-size: var(--font-size-xs);
+}
+
+/* Avoid oversized side gutters on wide desktop workspaces. */
+@media (min-width: 1600px) {
+  .partner-content {
+    max-width: none !important;
+    padding-inline: var(--spacing-lg) !important;
+  }
+
+  .partner-content .classes-container,
+  .partner-content .outlets-management-inner,
+  .partner-content .profile-content,
+  .partner-content .earnings-page,
+  .partner-content .makeup-page,
+  .partner-content .partner-reviews-page,
+  .partner-content .partner-promotions-page,
+  .partner-content .partner-notifications-page,
+  .partner-content .session-page {
+    max-width: none;
+  }
+
+  .partner-content > .profile-container {
+    max-width: none;
+    margin: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .partner-content {
+    padding: var(--spacing-md) !important;
+  }
+
+  .partner-content .classes-container,
+  .partner-content .profile-content,
+  .partner-content .earnings-page,
+  .partner-content .makeup-page,
+  .partner-content .partner-reviews-page,
+  .partner-content .partner-promotions-page,
+  .partner-content .partner-notifications-page,
+  .partner-content .session-page,
+  .partner-content .outlets-management-inner {
+    gap: var(--spacing-md);
+  }
+
+  .partner-content .classes-page-header,
+  .partner-content .outlets-header,
+  .partner-content .profile-header,
+  .partner-content .earnings-header,
+  .partner-content .makeup-header,
+  .partner-content .partner-reviews-header,
+  .partner-content .partner-promotions-header,
+  .partner-content .partner-notifications-header,
+  .partner-content .session-page-header {
+    padding: var(--spacing-lg) var(--spacing-md) !important;
+  }
+
+  .partner-content .welcome-title,
+  .partner-content .outlets-title,
+  .partner-content .profile-title,
+  .partner-content .earnings-header h1.ant-typography,
+  .partner-content .makeup-header h1.ant-typography,
+  .partner-content .partner-reviews-header h1.ant-typography,
+  .partner-content .partner-promotions-header h1.ant-typography,
+  .partner-content .partner-notifications-header h1.ant-typography,
+  .partner-content .session-page-header h1.ant-typography {
+    font-size: var(--font-size-2xl) !important;
+  }
+
+  .partner-content .earnings-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-sm);
+  }
+
+  .partner-content .earnings-summary-card,
+  .partner-content .dashboard-stat-card {
+    min-height: 112px;
+    padding: var(--spacing-md);
+  }
+}
