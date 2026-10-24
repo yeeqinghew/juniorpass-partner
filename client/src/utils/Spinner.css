@@ -1,0 +1,11 @@
+.partner-spinner {
+  align-items: center;
+  display: flex;
+  height: calc(100vh - 425px);
+  justify-content: center;
+}
+
+.partner-spinner-icon {
+  font-size: 100px;
+  text-align: center;
+}

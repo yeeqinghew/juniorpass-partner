@@ -90,3 +90,11 @@
     font-size: var(--font-size-xl);
   }
 }
+.loading-overlay-spinner {
+  font-size: 48px;
+}
+
+.loading-overlay-progress {
+  max-width: 80%;
+  width: 300px;
+}
