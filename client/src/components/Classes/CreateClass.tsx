@@ -31,6 +31,11 @@ import "./ClassEdit.css";
 const { Title, Text } = Typography;
 const { Dragger } = Upload;
 
+const isPositiveWholeNumber = (value: unknown) => {
+  const number = Number(value);
+  return Number.isInteger(number) && number > 0;
+};
+
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
 /**
@@ -156,15 +161,14 @@ const CreateClass = () => {
           (schedule) =>
             schedule.time_slots.length === 0 ||
             (schedule.is_progressive &&
-              (!Number.isInteger(schedule.capacity) ||
-                schedule.capacity < 1)) ||
+              !isPositiveWholeNumber(schedule.capacity)) ||
             schedule.time_slots.some(
               (slot) =>
                 !slot.day ||
                 !Array.isArray(slot.timeslot) ||
                 slot.timeslot.length !== 2 ||
                 (!schedule.is_progressive &&
-                  (!Number.isInteger(slot.slots) || slot.slots < 1)),
+                  !isPositiveWholeNumber(slot.slots)),
             ),
         ),
     );
