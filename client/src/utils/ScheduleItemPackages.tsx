@@ -33,14 +33,12 @@ import {
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import TimeRangePicker from "./TimeRangePicker";
-import * as dayModule from "../data/day.json";
-import * as frequencyModule from "../data/frequency.json";
+import day from "../data/day.json";
+import frequency from "../data/frequency.json";
 import { DataContext } from "../hooks/DataContext";
 import "./ScheduleItemPackages.css";
 
 const { Text } = Typography;
-const day = Object.values(dayModule);
-const frequency = Object.values(frequencyModule);
 
 // ─── constants ───────────────────────────────────────────────────────────────
 
