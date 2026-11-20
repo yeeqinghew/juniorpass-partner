@@ -157,7 +157,13 @@ const Earnings = () => {
       key: "class",
       render: (value, earning) => (
         <div className="earning-class-cell">
-          <Text strong>{value || (earning.source === "OPENING_BALANCE" ? "Opening balance" : "—")}</Text>
+          <Text strong>
+            {value || (earning.source === "OPENING_BALANCE"
+              ? "Opening balance"
+              : earning.source === "MANUAL_ADJUSTMENT"
+                ? "Manual credit adjustment"
+                : "—")}
+          </Text>
           {earning.scheduled_date && <Text type="secondary">{date(earning.scheduled_date)}</Text>}
         </div>
       ),
